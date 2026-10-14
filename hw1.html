@@ -22,12 +22,41 @@
   <main>
     <section id="params">
       <h2><span class="sec-num">1</span> Curve, base point and private key</h2>
-      <p class="todo">To do: input form for p, b, G and k.</p>
+      <p class="note">Curve <span class="math">y² = x³ + b (mod p)</span>, as in secp256k1 where <span class="math">a = 0</span>.</p>
+      <form id="param-form" class="param-form" novalidate>
+        <label for="in-p"><span class="lbl">p</span> <span class="hint">prime modulus</span>
+          <input id="in-p" name="p" type="number" min="3" step="1" value="17" required>
+        </label>
+        <label for="in-b"><span class="lbl">b</span> <span class="hint">constant term</span>
+          <input id="in-b" name="b" type="number" step="1" value="7" required>
+        </label>
+        <label for="in-gx"><span class="lbl">G<sub>x</sub></span> <span class="hint">base point x</span>
+          <input id="in-gx" name="gx" type="number" min="0" step="1" value="1" required>
+        </label>
+        <label for="in-gy"><span class="lbl">G<sub>y</sub></span> <span class="hint">base point y</span>
+          <input id="in-gy" name="gy" type="number" min="0" step="1" value="5" required>
+        </label>
+        <label for="in-k"><span class="lbl">k</span> <span class="hint">private key</span>
+          <input id="in-k" name="k" type="number" min="1" step="1" value="6" required>
+        </label>
+        <button id="btn-compute" type="submit">Compute Q = kG</button>
+      </form>
+      <p id="param-error" class="error" role="alert" hidden></p>
+      <p id="param-check" class="check"></p>
     </section>
 
     <section id="compute">
       <h2><span class="sec-num">2</span> Computing G, 2G, …, kG</h2>
-      <p class="todo">To do: step-by-step table and toy public key.</p>
+      <p class="note">Each row adds G to the previous point: <span class="math">(j+1)G = jG + G</span>. The first step is a doubling (tangent line), the others are additions (secant line).</p>
+      <div class="table-wrap">
+        <table id="steps-table" class="steps">
+          <thead>
+            <tr><th scope="col">j</th><th scope="col">Operation</th><th scope="col" class="greek">λ</th><th scope="col">jG</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="public-key" class="result" aria-live="polite"></div>
     </section>
 
     <section id="visual">
@@ -47,6 +76,7 @@
   </main>
 
   <script src="js/hw1/ec.js"></script>
+  <script src="js/hw1/compute.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
