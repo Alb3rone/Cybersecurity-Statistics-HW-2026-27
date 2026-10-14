@@ -39,10 +39,16 @@
         <label for="in-k"><span class="lbl">k</span> <span class="hint">private key</span>
           <input id="in-k" name="k" type="number" min="1" step="1" value="6" required>
         </label>
-        <button id="btn-compute" type="submit">Compute Q = kG</button>
+        <button id="btn-compute" type="submit">Compute</button>
       </form>
       <p id="param-error" class="error" role="alert" hidden></p>
       <p id="param-check" class="check"></p>
+      <dl id="curve-info" class="facts"></dl>
+      <div class="base-picker">
+        <label for="in-base">Use another base point</label>
+        <select id="in-base"></select>
+        <button id="btn-random-g" type="button" class="secondary">Random base point</button>
+      </div>
     </section>
 
     <section id="compute">
@@ -56,7 +62,27 @@
           <tbody></tbody>
         </table>
       </div>
+      <p id="naive-skipped" class="note" hidden></p>
       <div id="public-key" class="result" aria-live="polite"></div>
+
+      <h3>Faster method: double-and-add</h3>
+      <p class="note">
+        Adding G one step at a time needs <span class="math">k − 1</span> additions, which is hopeless for a
+        256-bit key. Double-and-add reads <span class="math">k</span> in binary from the most significant bit:
+        for every bit it doubles the running point <span class="math">R</span>, and when the bit is 1 it also
+        adds <span class="math">G</span>. The number of operations grows with the number of bits of
+        <span class="math">k</span>, about <span class="math">log₂ k</span>, instead of with <span class="math">k</span> itself.
+      </p>
+      <p id="dna-bits" class="bits"></p>
+      <div class="table-wrap">
+        <table id="dna-table" class="steps">
+          <thead>
+            <tr><th scope="col">Bit</th><th scope="col">k so far</th><th scope="col">Double</th><th scope="col">Add G</th><th scope="col">R</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p id="dna-compare" class="compare"></p>
     </section>
 
     <section id="visual">

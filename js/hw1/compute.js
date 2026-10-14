@@ -1,5 +1,8 @@
 const MAX_P = 67108859;
 const MAX_ROWS_SHOWN = 60;
+const MAX_NAIVE_K = 100000;
+const MAX_COUNT_P = 2000000;
+const MAX_LISTED_POINTS = 400;
 
 function readParams() {
   const value = id => Number(document.getElementById(id).value);
@@ -14,7 +17,7 @@ function validateParams({ p, b, gx, gy, k }) {
   if (p > MAX_P) return "p is too large for this demo: use a prime below " + MAX_P + ".";
   if (mod(b, p) === 0) return "b must not be a multiple of p, otherwise the curve y² = x³ is singular.";
   if (gx < 0 || gx >= p || gy < 0 || gy >= p) return "The coordinates of G must be between 0 and p − 1.";
-  if (k < 1) return "The private key k must be a positive integer.";
+  if (k < 1 || k > Number.MAX_SAFE_INTEGER) return "The private key k must be a positive integer below 2⁵³.";
   const curve = makeCurve(p, 0, b);
   if (!isOnCurve(curve, { x: gx, y: gy })) {
     const lhs = mulmod(gy, gy, p);
@@ -67,6 +70,42 @@ function renderSteps(steps) {
   }
 }
 
+function renderDoubleAndAdd(k, dna) {
+  document.getElementById("dna-bits").textContent = "k = " + k + " = " + dna.bits + "₂ (" + dna.bits.length + " bits)";
+  const body = document.querySelector("#dna-table tbody");
+  body.replaceChildren();
+  dna.trace.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    const value = parseInt(row.prefix, 2);
+    const doubleText = isInfinity(row.before) ? "2·O = O" : "2·" + pointToString(row.before) + " = " + pointToString(row.doubled);
+    const addText = row.addOp ? pointToString(row.doubled) + " + G = " + pointToString(row.after) : "–";
+    tr.append(cell(row.bit, "num"), cell(row.prefix + "₂ = " + value, "num"), cell(doubleText, "num"), cell(addText, "num"), cell(pointToString(row.after) + " = " + value + "G", "num"));
+    if (i === dna.trace.length - 1) tr.className = "final";
+    body.append(tr);
+  });
+}
+
+function countOperations(dna) {
+  let doublings = 0;
+  let additions = 0;
+  dna.trace.forEach((row, i) => {
+    if (i > 0) doublings++;
+    if (row.addOp && i > 0) additions++;
+  });
+  return { doublings, additions };
+}
+
+function plural(n, word) {
+  return n + " " + word + (n === 1 ? "" : "s");
+}
+
+function renderComparison(k, dna) {
+  const { doublings, additions } = countOperations(dna);
+  const box = document.getElementById("dna-compare");
+  box.textContent = "Group operations for k = " + k + ": " + (k - 1) + " with repeated addition, " +
+    (doublings + additions) + " with double-and-add (" + plural(doublings, "doubling") + " + " + plural(additions, "addition") + ").";
+}
+
 function renderPublicKey(k, Q) {
   const box = document.getElementById("public-key");
   box.replaceChildren();
@@ -77,6 +116,77 @@ function renderPublicKey(k, Q) {
   value.className = "result-value";
   value.textContent = "Q = " + k + "G = " + pointToString(Q);
   box.append(label, value);
+}
+
+function fact(list, term, text) {
+  const dt = document.createElement("dt");
+  dt.textContent = term;
+  const dd = document.createElement("dd");
+  dd.textContent = text;
+  list.append(dt, dd);
+}
+
+function renderCurveInfo(curve, G, k) {
+  const list = document.getElementById("curve-info");
+  list.replaceChildren();
+  if (curve.p > MAX_COUNT_P) {
+    fact(list, "Points on the curve", "not counted for p above " + MAX_COUNT_P);
+    return null;
+  }
+  const total = countPoints(curve);
+  const n = pointOrder(curve, G, total);
+  fact(list, "Points on the curve", total + " (" + (total - 1) + " affine points + O)");
+  fact(list, "Order of G", n + " (the smallest n with nG = O)");
+  fact(list, "Distinct public keys from G", n - 1 + " (k = 1 … " + (n - 1) + ")");
+  if (k >= n) fact(list, "Note", "k = " + k + " ≥ n, so kG = (k mod n)G = " + (k % n) + "G.");
+  return n;
+}
+
+function renderBasePicker(curve, G) {
+  const select = document.getElementById("in-base");
+  select.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  if (curve.p > MAX_LISTED_POINTS) {
+    placeholder.textContent = "list available for p ≤ " + MAX_LISTED_POINTS;
+    select.append(placeholder);
+    select.disabled = true;
+    return;
+  }
+  select.disabled = false;
+  placeholder.textContent = "choose a point…";
+  select.append(placeholder);
+  for (const P of listPoints(curve)) {
+    const option = document.createElement("option");
+    option.value = P.x + "," + P.y;
+    option.textContent = pointToString(P) + " · order " + pointOrder(curve, P, curve.p * 2);
+    if (P.x === G.x && P.y === G.y) option.selected = true;
+    select.append(option);
+  }
+}
+
+function setBasePoint(x, y) {
+  document.getElementById("in-gx").value = x;
+  document.getElementById("in-gy").value = y;
+  compute();
+}
+
+function randomBasePoint() {
+  const p = Number(document.getElementById("in-p").value);
+  const b = Number(document.getElementById("in-b").value);
+  if (!isPrime(p) || p > MAX_P) return;
+  const curve = makeCurve(p, 0, b);
+  for (let attempt = 0; attempt < 1000; attempt++) {
+    const x = Math.floor(Math.random() * p);
+    const rhs = mod(mulmod(mulmod(x, x, p), x, p) + curve.b, p);
+    if (rhs === 0 || !isQuadraticResidue(rhs, p)) continue;
+    for (let y = 1; y < p; y++) {
+      if (mulmod(y, y, p) === rhs) {
+        setBasePoint(x, Math.random() < 0.5 ? y : p - y);
+        return;
+      }
+    }
+  }
 }
 
 function compute(event) {
@@ -94,12 +204,36 @@ function compute(event) {
   errorBox.hidden = true;
   const curve = makeCurve(params.p, 0, params.b);
   const G = { x: params.gx, y: params.gy };
+  const k = params.k;
   const g2 = mulmod(G.y, G.y, curve.p);
   check.textContent = "G = " + pointToString(G) + " is on the curve: " + G.y + "² ≡ " + g2 + " ≡ " + G.x + "³ + " + curve.b + " (mod " + curve.p + ").";
-  const steps = sequentialMultiples(curve, G, params.k);
-  renderSteps(steps);
-  renderPublicKey(params.k, steps[steps.length - 1].point);
+  renderCurveInfo(curve, G, k);
+  renderBasePicker(curve, G);
+
+  const dna = scalarMultiply(curve, k, G);
+  const skipped = document.getElementById("naive-skipped");
+  const table = document.getElementById("steps-table");
+  if (k <= MAX_NAIVE_K) {
+    const steps = sequentialMultiples(curve, G, k);
+    renderSteps(steps);
+    table.hidden = false;
+    skipped.hidden = true;
+    if (!samePoint(steps[steps.length - 1].point, dna.result)) throw new Error("The two methods disagree.");
+  } else {
+    table.hidden = true;
+    skipped.textContent = "k is larger than " + MAX_NAIVE_K + ": repeated addition is skipped and Q is computed with double-and-add below.";
+    skipped.hidden = false;
+  }
+  renderPublicKey(k, dna.result);
+  renderDoubleAndAdd(k, dna);
+  renderComparison(k, dna);
 }
 
 document.getElementById("param-form").addEventListener("submit", compute);
+document.getElementById("in-base").addEventListener("change", event => {
+  if (!event.target.value) return;
+  const [x, y] = event.target.value.split(",").map(Number);
+  setBasePoint(x, y);
+});
+document.getElementById("btn-random-g").addEventListener("click", randomBasePoint);
 compute();

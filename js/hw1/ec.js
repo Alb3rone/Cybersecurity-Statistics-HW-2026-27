@@ -102,3 +102,61 @@ function addPoints(curve, P, Q) {
 function pointToString(P) {
   return isInfinity(P) ? "O" : "(" + P.x + ", " + P.y + ")";
 }
+
+function scalarMultiply(curve, k, G) {
+  const bits = k.toString(2);
+  const trace = [];
+  let R = INFINITY;
+  for (let i = 0; i < bits.length; i++) {
+    const before = R;
+    const doubled = addDetailed(curve, R, R);
+    R = doubled.result;
+    const row = { bit: bits[i], prefix: bits.slice(0, i + 1), doubled: R, doubleOp: doubled, before };
+    if (bits[i] === "1") {
+      const added = addDetailed(curve, R, G);
+      R = added.result;
+      row.addOp = added;
+    }
+    row.after = R;
+    trace.push(row);
+  }
+  return { result: R, bits, trace };
+}
+
+function countPoints(curve) {
+  const { p, a, b } = curve;
+  let count = 1;
+  for (let x = 0; x < p; x++) {
+    const rhs = mod(mulmod(mulmod(x, x, p), x, p) + mulmod(a, x, p) + b, p);
+    if (rhs === 0) count += 1;
+    else if (powmod(rhs, (p - 1) / 2, p) === 1) count += 2;
+  }
+  return count;
+}
+
+function pointOrder(curve, G, limit) {
+  let n = 1;
+  let P = G;
+  while (!isInfinity(P)) {
+    P = addPoints(curve, P, G);
+    n++;
+    if (n > limit) return null;
+  }
+  return n;
+}
+
+function listPoints(curve) {
+  const { p, a, b } = curve;
+  const roots = new Map();
+  for (let y = 0; y < p; y++) {
+    const s = mulmod(y, y, p);
+    if (!roots.has(s)) roots.set(s, []);
+    roots.get(s).push(y);
+  }
+  const points = [];
+  for (let x = 0; x < p; x++) {
+    const rhs = mod(mulmod(mulmod(x, x, p), x, p) + mulmod(a, x, p) + b, p);
+    for (const y of roots.get(rhs) || []) points.push({ x, y });
+  }
+  return points;
+}
