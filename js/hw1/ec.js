@@ -45,6 +45,60 @@ function isQuadraticResidue(a, p) {
   return a === 0 || powmod(a, (p - 1) / 2, p) === 1;
 }
 
-if (typeof module !== "undefined") {
-  module.exports = { mod, mulmod, invmod, powmod, isPrime, isQuadraticResidue };
+
+const INFINITY = null;
+
+function makeCurve(p, a, b) {
+  return { p, a: mod(a, p), b: mod(b, p) };
+}
+
+function isInfinity(P) {
+  return P === INFINITY;
+}
+
+function samePoint(P, Q) {
+  if (isInfinity(P) || isInfinity(Q)) return isInfinity(P) && isInfinity(Q);
+  return P.x === Q.x && P.y === Q.y;
+}
+
+function isOnCurve(curve, P) {
+  if (isInfinity(P)) return true;
+  const { p, a, b } = curve;
+  if (P.x < 0 || P.x >= p || P.y < 0 || P.y >= p) return false;
+  const left = mulmod(P.y, P.y, p);
+  const right = mod(mulmod(mulmod(P.x, P.x, p), P.x, p) + mulmod(a, P.x, p) + b, p);
+  return left === right;
+}
+
+function negate(curve, P) {
+  if (isInfinity(P)) return INFINITY;
+  return { x: P.x, y: mod(-P.y, curve.p) };
+}
+
+function addDetailed(curve, P, Q) {
+  const { p, a } = curve;
+  if (isInfinity(P)) return { result: Q, kind: "identity" };
+  if (isInfinity(Q)) return { result: P, kind: "identity" };
+  if (P.x === Q.x && mod(P.y + Q.y, p) === 0) {
+    return { result: INFINITY, kind: "opposite" };
+  }
+  let lambda, kind;
+  if (samePoint(P, Q)) {
+    lambda = mulmod(mod(3 * mulmod(P.x, P.x, p) + a, p), invmod(2 * P.y, p), p);
+    kind = "double";
+  } else {
+    lambda = mulmod(mod(Q.y - P.y, p), invmod(Q.x - P.x, p), p);
+    kind = "add";
+  }
+  const x3 = mod(mulmod(lambda, lambda, p) - P.x - Q.x, p);
+  const y3 = mod(mulmod(lambda, P.x - x3, p) - P.y, p);
+  return { result: { x: x3, y: y3 }, kind, lambda, third: { x: x3, y: mod(-y3, p) } };
+}
+
+function addPoints(curve, P, Q) {
+  return addDetailed(curve, P, Q).result;
+}
+
+function pointToString(P) {
+  return isInfinity(P) ? "O" : "(" + P.x + ", " + P.y + ")";
 }
