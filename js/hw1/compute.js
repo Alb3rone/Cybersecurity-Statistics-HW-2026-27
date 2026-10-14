@@ -227,6 +227,7 @@ function compute(event) {
   renderPublicKey(k, dna.result);
   renderDoubleAndAdd(k, dna);
   renderComparison(k, dna);
+  renderVisual(curve, G, k, dna);
 }
 
 document.getElementById("param-form").addEventListener("submit", compute);

@@ -87,7 +87,39 @@
 
     <section id="visual">
       <h2><span class="sec-num">3</span> Slowed-down visualization</h2>
-      <p class="todo">To do: SVG animation of each point addition.</p>
+      <p class="note">
+        Every point of the curve is drawn on the p × p grid. For each addition the animation shows the
+        line through the two points (the tangent when doubling), the third point where that line meets the curve,
+        and its reflection, which is the result. Modulo p the "line" is the set of points
+        <span class="math">y ≡ λ(x − x₁) + y₁</span>, so it wraps around the edges of the grid.
+      </p>
+      <div class="viz-controls">
+        <label for="viz-mode">Algorithm
+          <select id="viz-mode">
+            <option value="sequential">Repeated addition: G, 2G, …, kG</option>
+            <option value="dna">Double-and-add</option>
+          </select>
+        </label>
+        <label for="viz-speed">Speed
+          <input id="viz-speed" type="range" min="150" max="2000" step="50" value="900">
+        </label>
+        <div class="viz-buttons">
+          <button id="viz-play" type="button">Play</button>
+          <button id="viz-step" type="button" class="secondary">Step</button>
+          <button id="viz-reset" type="button" class="secondary">Reset</button>
+        </div>
+      </div>
+      <p id="viz-caption" class="viz-caption" aria-live="polite"></p>
+      <div class="viz-wrap">
+        <svg id="viz" role="img" aria-label="Points of the curve and the current point addition"></svg>
+      </div>
+      <ul class="viz-legend">
+        <li><span class="sw sw-point"></span>curve point</li>
+        <li><span class="sw sw-operand"></span>points being added</li>
+        <li><span class="sw sw-line"></span>line mod p</li>
+        <li><span class="sw sw-third"></span>third intersection</li>
+        <li><span class="sw sw-result"></span>result</li>
+      </ul>
     </section>
 
     <section id="stats">
@@ -102,6 +134,7 @@
   </main>
 
   <script src="js/hw1/ec.js"></script>
+  <script src="js/hw1/visual.js"></script>
   <script src="js/hw1/compute.js"></script>
 
   <footer class="page-foot">
