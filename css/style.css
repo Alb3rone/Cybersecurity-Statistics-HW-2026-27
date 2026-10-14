@@ -1,0 +1,91 @@
+/* Shared styles. Every colour is a token so light and dark themes stay in sync. */
+:root {
+  --bg: #f4f6f7;
+  --surface: #ffffff;
+  --ink: #142028;
+  --ink-2: #4a5963;
+  --ink-3: #7c8a93;
+  --line: #d8dfe3;
+  --accent: #2a78d6;      /* points, links, series 1 */
+  --accent-2: #eb6834;    /* current point, series 2 */
+  --good: #1f8a4c;
+  --bad: #c43d3d;
+
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11171b;
+    --surface: #182127;
+    --ink: #e8eef1;
+    --ink-2: #a9b6be;
+    --ink-3: #7d8b94;
+    --line: #2b373f;
+    --accent: #3987e5;
+    --accent-2: #d95926;
+    --good: #3fb36f;
+    --bad: #e66767;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.6 var(--font-body);
+}
+a { color: var(--accent); }
+.page-head, main, .page-foot {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-inline: 16px;
+}
+.page-head { padding-block: 40px 16px; }
+.page-head h1 { margin: 4px 0 8px; font-size: 2rem; line-height: 1.2; text-wrap: balance; }
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.eyebrow a { color: inherit; }
+.lead { max-width: 65ch; color: var(--ink-2); margin: 0; }
+.math, code { font-family: var(--font-mono); font-size: 0.92em; }
+
+main { display: grid; gap: 24px; padding-block: 16px 48px; }
+section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-width: 0;
+}
+section h2 { margin: 0 0 12px; font-size: 1.25rem; display: flex; gap: 10px; align-items: baseline; }
+.sec-num { font-family: var(--font-mono); color: var(--accent); font-size: 0.95rem; }
+.todo { color: var(--ink-3); font-style: italic; margin: 0; }
+
+.page-foot { padding-block: 0 32px; color: var(--ink-3); font-size: 0.85rem; }
+
+/* index page */
+.hw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.hw-list li > a, .hw-list li.locked {
+  display: grid;
+  gap: 2px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+}
+.hw-list li > a:hover, .hw-list li > a:focus-visible { border-color: var(--accent); }
+.hw-list .locked { opacity: 0.6; }
+.hw-num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); }
+.hw-title { font-weight: 600; font-size: 1.1rem; }
+.hw-desc { color: var(--ink-2); font-size: 0.95rem; }

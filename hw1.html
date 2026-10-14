@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 1 – Private key → public key</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 1</p>
+    <h1>Private key → public key</h1>
+    <p class="lead">
+      Elliptic-curve scalar multiplication as a one-way function: computing
+      <span class="math">Q = kG</span> is easy, recovering <span class="math">k</span> from
+      <span class="math">Q</span> is hard (ECDLP). Ethereum uses the curve secp256k1,
+      <span class="math">y² = x³ + 7</span> over a 256-bit prime field. Here we use the same
+      equation over a tiny field.
+    </p>
+  </header>
+
+  <main>
+    <section id="params">
+      <h2><span class="sec-num">1</span> Curve, base point and private key</h2>
+      <p class="todo">To do: input form for p, b, G and k.</p>
+    </section>
+
+    <section id="compute">
+      <h2><span class="sec-num">2</span> Computing G, 2G, …, kG</h2>
+      <p class="todo">To do: step-by-step table and toy public key.</p>
+    </section>
+
+    <section id="visual">
+      <h2><span class="sec-num">3</span> Slowed-down visualization</h2>
+      <p class="todo">To do: SVG animation of each point addition.</p>
+    </section>
+
+    <section id="stats">
+      <h2><span class="sec-num">4</span> Statistical exploration</h2>
+      <p class="todo">To do: distributions, bits, correlations, avalanche test.</p>
+    </section>
+
+    <section id="discussion">
+      <h2><span class="sec-num">5</span> Discussion</h2>
+      <p class="todo">To do: one-way function properties vs hash function properties.</p>
+    </section>
+  </main>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
