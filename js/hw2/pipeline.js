@@ -204,9 +204,17 @@ function renderHashDemo() {
   const bytes = new TextEncoder().encode(text);
   const list = document.getElementById("hash-demo");
   list.replaceChildren();
-  for (const [name, fn] of [["SHA-256", sha256], ["Keccak-256", keccak256], ["SHA3-256", sha3_256]]) {
-    list.append(el("dt", "", name), el("dd", "mono", bytesToHex(fn(bytes))));
+  const kec = keccak256(bytes);
+  const sha3 = sha3_256(bytes);
+  for (const [name, digest] of [["SHA-256", sha256(bytes)], ["Keccak-256", kec], ["SHA3-256", sha3]]) {
+    list.append(el("dt", "", name), el("dd", "mono", bytesToHex(digest)));
   }
+  let differing = 0;
+  for (let i = 0; i < 32; i++) {
+    let x = kec[i] ^ sha3[i];
+    while (x) { x &= x - 1; differing++; }
+  }
+  list.append(el("dt", "", "Keccak vs SHA3"), el("dd", "", differing + " of 256 bits differ, the same as two unrelated random strings (about 128 expected)."));
 }
 
 document.getElementById("wallet-form").addEventListener("submit", runPipeline);

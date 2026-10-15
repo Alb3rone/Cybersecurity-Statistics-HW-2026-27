@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HMWK 1 – Private key → public key</title>
+  <title>HMWK 1 – Scalar multiplication on a toy curve</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="page-head">
-    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 1</p>
-    <h1>Private key → public key</h1>
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 1 · private key to public key</p>
+    <h1>Scalar multiplication on a toy curve</h1>
     <p class="lead">
       Elliptic-curve scalar multiplication as a one-way function: computing
       <span class="math">Q = kG</span> is easy, recovering <span class="math">k</span> from
@@ -39,7 +39,7 @@
         <label for="in-k"><span class="lbl">k</span> <span class="hint">private key</span>
           <input id="in-k" name="k" type="number" min="1" step="1" value="6" required>
         </label>
-        <button id="btn-compute" type="submit">Compute</button>
+        <button id="btn-compute" type="submit">Calculate Q</button>
       </form>
       <p id="param-error" class="error" role="alert" hidden></p>
       <p id="param-check" class="check"></p>
@@ -100,13 +100,13 @@
             <option value="dna">Double-and-add</option>
           </select>
         </label>
-        <label for="viz-speed">Speed
+        <label for="viz-speed">Animation speed
           <input id="viz-speed" type="range" min="150" max="2000" step="50" value="900">
         </label>
         <div class="viz-buttons">
-          <button id="viz-play" type="button">Play</button>
-          <button id="viz-step" type="button" class="secondary">Step</button>
-          <button id="viz-reset" type="button" class="secondary">Reset</button>
+          <button id="viz-play" type="button">Animate</button>
+          <button id="viz-step" type="button" class="secondary">Next step</button>
+          <button id="viz-reset" type="button" class="secondary">Restart</button>
         </div>
       </div>
       <p id="viz-caption" class="viz-caption" aria-live="polite"></p>

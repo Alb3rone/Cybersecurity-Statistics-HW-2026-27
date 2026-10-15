@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HMWK 2 – From wallet seed to Ethereum address</title>
+  <title>HMWK 2 – Twelve words to an Ethereum address</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="page-head">
-    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 2</p>
-    <h1>From wallet seed to Ethereum address</h1>
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 2 · wallet seed to Ethereum address</p>
+    <h1>Twelve words to an Ethereum address</h1>
     <p class="lead">
       A wallet such as MetaMask turns twelve words into an Ethereum address through six standards, each built on a
       different cryptographic primitive. This page runs the whole pipeline in the browser, explains the job of every
@@ -139,7 +139,7 @@
         Keccak-256 and SHA3-256 run the same permutation and differ only in the padding byte, yet their outputs are
         completely unrelated. Type something to compare the three functions:
       </p>
-      <label for="in-hash" class="hash-label">Text to hash
+      <label for="in-hash" class="hash-label">Input string
         <input id="in-hash" type="text" value="" placeholder="empty string" autocomplete="off">
       </label>
       <dl id="hash-demo" class="hash-demo"></dl>
@@ -155,8 +155,11 @@
         <li><strong>EIP-55 → error detection.</strong> A typo in an address sends money to the wrong place forever. A checksum catches it, and EIP-55 does this without breaking existing lowercase addresses.</li>
       </ul>
       <p>
-        Separating the jobs also limits damage: a weakness in one primitive does not automatically break the others,
-        and each part can be replaced or studied on its own. It is the same principle as layering in network protocols.
+        The requirements even contradict each other. PBKDF2 must be deliberately slow, while the address hash must be
+        fast because every node computes it for every transaction. secp256k1 must keep an algebraic structure, while
+        Keccak-256 must destroy it. A checksum must be cheap and short, while a hash used for security must be long
+        enough that collisions cannot be found. No single algorithm can be slow and fast, structured and structureless,
+        short and long at the same time, so each requirement gets the primitive designed for it.
       </p>
     </section>
 

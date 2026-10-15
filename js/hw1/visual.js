@@ -70,7 +70,7 @@ function buildDnaOps(curve, G, dna) {
 function stopTimer() {
   if (viz.timer) clearInterval(viz.timer);
   viz.timer = null;
-  document.getElementById("viz-play").textContent = "Play";
+  document.getElementById("viz-play").textContent = "Animate";
 }
 
 function resetVisual() {
