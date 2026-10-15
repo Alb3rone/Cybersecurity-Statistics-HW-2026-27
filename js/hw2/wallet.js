@@ -36,14 +36,6 @@ function randomBytes(n) {
   return crypto.getRandomValues(new Uint8Array(n));
 }
 
-function entropyToMnemonic(entropy) {
-  const checksumBits = entropy.length * 8 / 32;
-  const bits = bytesToBits(entropy) + bytesToBits(sha256(entropy)).slice(0, checksumBits);
-  const words = [];
-  for (let i = 0; i < bits.length; i += 11) words.push(BIP39_WORDLIST[parseInt(bits.slice(i, i + 11), 2)]);
-  return { words, bits, checksumBits };
-}
-
 function normalizeMnemonic(text) {
   return text.normalize("NFKD").trim().toLowerCase().split(/\s+/).filter(Boolean);
 }
@@ -148,9 +140,4 @@ function toChecksumAddress(lowerHex) {
     out += /[a-f]/.test(c) && parseInt(hash[i], 16) >= 8 ? c.toUpperCase() : c;
   }
   return { address: "0x" + out, hash };
-}
-
-function isValidChecksumAddress(address) {
-  const body = address.replace(/^0x/, "");
-  return toChecksumAddress(body.toLowerCase()).address === "0x" + body;
 }

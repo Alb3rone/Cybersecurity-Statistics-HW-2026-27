@@ -8,7 +8,6 @@ const viz = {
   curve: null,
   G: null,
   k: 0,
-  dna: null,
   ops: [],
   opIndex: 0,
   phase: 0,
@@ -48,25 +47,6 @@ function buildSequentialOps(curve, G, k) {
   return ops;
 }
 
-function buildDnaOps(curve, G, dna) {
-  const ops = [];
-  let value = 0;
-  for (const row of dna.trace) {
-    if (!isInfinity(row.before)) {
-      ops.push({ A: row.before, B: row.before, nameA: multipleName(value), nameB: multipleName(value), nameR: multipleName(2 * value), bit: row.bit, step: "double", detail: row.doubleOp });
-    }
-    value *= 2;
-    if (row.addOp) {
-      if (!isInfinity(row.doubled)) {
-        ops.push({ A: row.doubled, B: G, nameA: multipleName(value), nameB: "G", nameR: multipleName(value + 1), bit: row.bit, step: "add", detail: row.addOp });
-      }
-      value += 1;
-    }
-    if (ops.length >= VIZ_MAX_OPS) break;
-  }
-  return ops;
-}
-
 function stopTimer() {
   if (viz.timer) clearInterval(viz.timer);
   viz.timer = null;
@@ -78,16 +58,14 @@ function resetVisual() {
   viz.opIndex = 0;
   viz.phase = 0;
   viz.trail = viz.G ? [{ P: viz.G, name: "G" }] : [];
-  const mode = document.getElementById("viz-mode").value;
-  viz.ops = mode === "dna" ? buildDnaOps(viz.curve, viz.G, viz.dna) : buildSequentialOps(viz.curve, viz.G, viz.k);
+  viz.ops = buildSequentialOps(viz.curve, viz.G, viz.k);
   drawVisual();
 }
 
-function renderVisual(curve, G, k, dna) {
+function renderVisual(curve, G, k) {
   viz.curve = curve;
   viz.G = G;
   viz.k = k;
-  viz.dna = dna;
   resetVisual();
 }
 
@@ -126,8 +104,7 @@ function label(svg, P, text, cls) {
 function caption(op) {
   const { detail } = op;
   const lam = detail.lambda;
-  const prefix = (op.step ? "Bit " + op.bit + ", " + (op.step === "double" ? "double" : "add G") + " · " : "") +
-    "Step " + (viz.opIndex + 1) + " of " + viz.ops.length + ": ";
+  const prefix = "Step " + (viz.opIndex + 1) + " of " + viz.ops.length + ": ";
   const sum = op.detail.kind === "double"
     ? "2·" + op.nameA
     : op.nameA + " + " + op.nameB;
@@ -146,7 +123,7 @@ function drawVisual() {
   const svg = document.getElementById("viz");
   const cap = document.getElementById("viz-caption");
   svg.replaceChildren();
-  const controls = document.querySelectorAll("#viz-play, #viz-step, #viz-reset, #viz-mode");
+  const controls = document.querySelectorAll("#viz-play, #viz-step, #viz-reset");
   if (!viz.curve || viz.curve.p > VIZ_MAX_P) {
     svg.setAttribute("viewBox", "0 0 " + VIZ_SIZE + " 60");
     svg.append(svgEl("text", { x: VIZ_SIZE / 2, y: 34, class: "tick", "text-anchor": "middle" }, "The grid is drawn only for p ≤ " + VIZ_MAX_P + "."));
@@ -238,7 +215,6 @@ function togglePlay() {
 document.getElementById("viz-play").addEventListener("click", togglePlay);
 document.getElementById("viz-step").addEventListener("click", () => { stopTimer(); stepVisual(); });
 document.getElementById("viz-reset").addEventListener("click", resetVisual);
-document.getElementById("viz-mode").addEventListener("change", resetVisual);
 document.getElementById("viz-speed").addEventListener("input", () => {
   if (viz.timer) { stopTimer(); togglePlay(); }
 });

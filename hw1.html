@@ -44,11 +44,6 @@
       <p id="param-error" class="error" role="alert" hidden></p>
       <p id="param-check" class="check"></p>
       <dl id="curve-info" class="facts"></dl>
-      <div class="base-picker">
-        <label for="in-base">Use another base point</label>
-        <select id="in-base"></select>
-        <button id="btn-random-g" type="button" class="secondary">Random base point</button>
-      </div>
     </section>
 
     <section id="compute">
@@ -82,7 +77,6 @@
           <tbody></tbody>
         </table>
       </div>
-      <p id="dna-compare" class="compare"></p>
     </section>
 
     <section id="visual">
@@ -94,12 +88,6 @@
         <span class="math">y ≡ λ(x − x₁) + y₁</span>, so it wraps around the edges of the grid.
       </p>
       <div class="viz-controls">
-        <label for="viz-mode">Algorithm
-          <select id="viz-mode">
-            <option value="sequential">Repeated addition: G, 2G, …, kG</option>
-            <option value="dna">Double-and-add</option>
-          </select>
-        </label>
         <label for="viz-speed">Animation speed
           <input id="viz-speed" type="range" min="150" max="2000" step="50" value="900">
         </label>
@@ -126,98 +114,51 @@
       <h2><span class="sec-num">4</span> Statistical exploration</h2>
       <p class="note">
         The experiment is repeated for every private key <span class="math">k = 1 … n − 1</span>, where
-        <span class="math">n</span> is the order of the base point, so each run studies the complete set of public keys
-        that G can produce. The curve mod 17 has only 8 of them, too few for statistics, so the same equation
-        <span class="math">y² = x³ + 7</span> is also offered over larger primes whose number of points is prime.
-        Different base points can be tried with the second menu.
+        <span class="math">n</span> is the order of the base point. The curve mod 17 has only 8 such keys, too few for
+        statistics, so the same equation <span class="math">y² = x³ + 7</span> is also offered over larger primes.
       </p>
       <div class="stats-controls">
         <label for="st-curve">Curve
           <select id="st-curve">
             <option value="current">Curve and G from section 1</option>
-            <option value="1051">y² = x³ + 7 mod 1051 · 1093 points</option>
-            <option value="10477" selected>y² = x³ + 7 mod 10477 · 10639 points</option>
-            <option value="65167">y² = x³ + 7 mod 65167 · 64879 points</option>
+            <option value="1051">y² = x³ + 7 mod 1051</option>
+            <option value="10477" selected>y² = x³ + 7 mod 10477</option>
           </select>
         </label>
-        <label for="st-base">Base point
-          <select id="st-base">
-            <option value="default">Default (section 1 G, or smallest x)</option>
-            <option value="random">Random valid point</option>
-          </select>
-        </label>
-        <button id="st-run" type="button">Run again</button>
       </div>
       <p id="st-status" class="status" aria-live="polite"></p>
       <dl id="st-summary" class="facts"></dl>
 
-      <h3>4.1 Distribution of x and y, apparent uniformity</h3>
-      <p class="note">If public keys behaved like random points, each coordinate would be spread evenly over 0 … p − 1. The dashed lines show that expectation; the χ² test measures the distance from it.</p>
+      <h3>4.1 Distribution and frequency of x and y</h3>
       <div class="chart-grid">
         <div id="ch-x"></div>
         <div id="ch-y"></div>
       </div>
-      <div id="st-uniform" class="table-wrap"></div>
       <p id="st-uniform-text" class="finding"></p>
 
-      <h3>4.2 Frequency of individual values</h3>
-      <div id="ch-mult"></div>
-      <p id="st-mult-text" class="finding"></p>
-
-      <h3>4.3 Distribution of bits</h3>
+      <h3>4.2 Distribution of bits</h3>
       <div id="ch-bits"></div>
       <p id="st-bits-text" class="finding"></p>
 
-      <h3>4.4 Correlations between input and output</h3>
-      <div class="chart-grid">
-        <div id="ch-scatter"></div>
-        <div id="ch-scatter-lag"></div>
-      </div>
+      <h3>4.3 Correlations between input and output</h3>
       <div id="st-corr" class="table-wrap"></div>
       <p id="st-corr-text" class="finding"></p>
 
-      <h3>4.5 Avalanche-like behaviour</h3>
-      <p class="note">For each key k and each bit of k, the bit is flipped and the public keys are compared bit by bit. The same pairs of inputs are hashed with SHA-256 as a reference for a function designed to have the avalanche effect.</p>
-      <div id="ch-aval"></div>
-      <div id="st-aval" class="table-wrap"></div>
+      <h3>4.4 Avalanche-like behaviour</h3>
       <p id="st-aval-text" class="finding"></p>
     </section>
 
     <section id="discussion">
       <h2><span class="sec-num">5</span> Discussion</h2>
-      <p class="note">
-        Scalar multiplication and hash functions are both easy to compute and hard to invert, but they are built for
-        different jobs. The table separates the properties the homework asked to explore; the last column is filled in
-        from the analysis in section 4.
-      </p>
-      <div class="table-wrap">
-        <table class="props">
-          <thead>
-            <tr><th scope="col">Property</th><th scope="col">Needed by kG as a one-way function?</th><th scope="col">Typical of hash functions?</th><th scope="col">What the analysis shows</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Determinism, fast forward computation</td><td class="yes">Yes</td><td class="yes">Yes</td><td>Same k always gives the same Q; double-and-add needs about 2·log₂ k operations.</td></tr>
-            <tr><td>Hard to invert</td><td class="yes">Yes, this is the ECDLP</td><td class="yes">Yes (preimage resistance)</td><td id="obs-inversion"></td></tr>
-            <tr><td>Output reveals nothing useful about k (no correlation)</td><td class="yes">Yes</td><td class="yes">Yes</td><td id="obs-corr"></td></tr>
-            <tr><td>Apparent uniformity of the coordinates</td><td class="partly">Partly: Q should look like a random point of the group, not a random pair of numbers</td><td class="yes">Yes: every output string equally likely</td><td id="obs-uniform"></td></tr>
-            <tr><td>Frequency of individual values</td><td class="no">No, the counts follow from the curve's symmetries</td><td class="yes">Yes: no value should be special</td><td id="obs-freq"></td></tr>
-            <tr><td>Balanced distribution of bits</td><td class="no">No, it depends on how x and y are encoded</td><td class="yes">Yes: each output bit is 1 with probability ½</td><td id="obs-bits"></td></tr>
-            <tr><td>Avalanche effect</td><td class="no">No, kG is linear in k by design</td><td class="yes">Yes: one input bit changes about half the output bits</td><td id="obs-aval"></td></tr>
-            <tr><td>Collision resistance, fixed-length compression</td><td class="no">No, kG is a bijection on 1 … n − 1, there is nothing to compress</td><td class="yes">Yes: arbitrary input, fixed-size output, collisions hard to find</td><td id="obs-collision"></td></tr>
-          </tbody>
-        </table>
-      </div>
 
       <h3>What is meaningful for a one-way function</h3>
       <p>
-        A one-way function only has to be easy to compute and hard to invert. For <span class="math">Q = kG</span> the
+        A one-way function only has to be deterministic, easy to compute and hard to invert. For <span class="math">Q = kG</span> the
         hardness does not come from the output looking random: it comes from the size of the group. On the toy curves the
-        statistics look fine (no correlation, near-uniform classes, about half of the bits change) and yet every key is
+        statistics look fine (no correlation, coordinates spread over the range, about half of the bits change) and yet every key is
         recovered by trying all <span class="math">n − 1</span> values. On secp256k1 the same search would need about
-        2²⁵⁶ steps, and the best known algorithms (baby-step giant-step, Pollard's rho) still need about
-        √n ≈ 2¹²⁸. So the statistical tests here are a sanity check, a necessary condition, not a proof of security.
-        What matters is that the output does not leak k in a usable way and that n is large and prime, so that every
-        point other than O generates the whole group.
+        2²⁵⁶ steps, and the best known algorithms still need about √n ≈ 2¹²⁸. So the statistical tests are a necessary
+        condition, not a proof of security: what matters is that the output does not leak k in a usable way and that n is large.
       </p>
 
       <h3>What belongs to hash functions</h3>
@@ -225,24 +166,14 @@
         The avalanche effect, balanced output bits, fixed-length output and collision resistance are design goals of
         hash functions like SHA-256 or Keccak-256, which must behave like a random function with no structure.
         Scalar multiplication is the opposite: it is a group homomorphism, <span class="math">(k₁ + k₂)G = k₁G + k₂G</span>,
-        and the mirror symmetry <span class="math">(n − k)G = −kG</span> shows up in every frequency count. This structure is
-        not a weakness. ECDSA signatures and ECDH key exchange depend on it: in ECDH,
-        <span class="math">a(bG) = b(aG)</span> gives both parties the same secret. The "avalanche-like" change of
-        coordinates seen in 4.5 is a side effect of the addition formulas, not a design goal.
-      </p>
-
-      <h3>Link to Ethereum</h3>
-      <p>
-        In Ethereum the private key is a 256-bit number k, the public key is <span class="math">Q = kG</span> on secp256k1
-        (64 bytes, x‖y), and the address is the last 20 bytes of Keccak-256(Q). The pipeline uses both kinds of
-        function: scalar multiplication provides the algebraic link needed for signatures, and the hash adds the
-        properties that kG does not have, producing a short, uniform-looking identifier.
+        and it is a bijection on 1 … n − 1, so there is nothing to compress and no collisions. This structure is
+        not a weakness: ECDSA signatures and ECDH key exchange depend on it, for example
+        <span class="math">a(bG) = b(aG)</span> gives two parties the same secret.
       </p>
     </section>
   </main>
 
   <script src="js/hw1/ec.js"></script>
-  <script src="js/hw1/sha256.js"></script>
   <script src="js/hw1/charts.js"></script>
   <script src="js/hw1/visual.js"></script>
   <script src="js/hw1/compute.js"></script>

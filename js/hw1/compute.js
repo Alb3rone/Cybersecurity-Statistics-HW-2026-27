@@ -2,7 +2,6 @@ const MAX_P = 67108859;
 const MAX_ROWS_SHOWN = 60;
 const MAX_NAIVE_K = 100000;
 const MAX_COUNT_P = 2000000;
-const MAX_LISTED_POINTS = 400;
 
 function readParams() {
   const value = id => Number(document.getElementById(id).value);
@@ -85,27 +84,6 @@ function renderDoubleAndAdd(k, dna) {
   });
 }
 
-function countOperations(dna) {
-  let doublings = 0;
-  let additions = 0;
-  dna.trace.forEach((row, i) => {
-    if (i > 0) doublings++;
-    if (row.addOp && i > 0) additions++;
-  });
-  return { doublings, additions };
-}
-
-function plural(n, word) {
-  return n + " " + word + (n === 1 ? "" : "s");
-}
-
-function renderComparison(k, dna) {
-  const { doublings, additions } = countOperations(dna);
-  const box = document.getElementById("dna-compare");
-  box.textContent = "Group operations for k = " + k + ": " + (k - 1) + " with repeated addition, " +
-    (doublings + additions) + " with double-and-add (" + plural(doublings, "doubling") + " + " + plural(additions, "addition") + ").";
-}
-
 function renderPublicKey(k, Q) {
   const box = document.getElementById("public-key");
   box.replaceChildren();
@@ -142,53 +120,6 @@ function renderCurveInfo(curve, G, k) {
   return n;
 }
 
-function renderBasePicker(curve, G) {
-  const select = document.getElementById("in-base");
-  select.replaceChildren();
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  if (curve.p > MAX_LISTED_POINTS) {
-    placeholder.textContent = "list available for p ≤ " + MAX_LISTED_POINTS;
-    select.append(placeholder);
-    select.disabled = true;
-    return;
-  }
-  select.disabled = false;
-  placeholder.textContent = "choose a point…";
-  select.append(placeholder);
-  for (const P of listPoints(curve)) {
-    const option = document.createElement("option");
-    option.value = P.x + "," + P.y;
-    option.textContent = pointToString(P) + " · order " + pointOrder(curve, P, curve.p * 2);
-    if (P.x === G.x && P.y === G.y) option.selected = true;
-    select.append(option);
-  }
-}
-
-function setBasePoint(x, y) {
-  document.getElementById("in-gx").value = x;
-  document.getElementById("in-gy").value = y;
-  compute();
-}
-
-function randomBasePoint() {
-  const p = Number(document.getElementById("in-p").value);
-  const b = Number(document.getElementById("in-b").value);
-  if (!isPrime(p) || p > MAX_P) return;
-  const curve = makeCurve(p, 0, b);
-  for (let attempt = 0; attempt < 1000; attempt++) {
-    const x = Math.floor(Math.random() * p);
-    const rhs = mod(mulmod(mulmod(x, x, p), x, p) + curve.b, p);
-    if (rhs === 0 || !isQuadraticResidue(rhs, p)) continue;
-    for (let y = 1; y < p; y++) {
-      if (mulmod(y, y, p) === rhs) {
-        setBasePoint(x, Math.random() < 0.5 ? y : p - y);
-        return;
-      }
-    }
-  }
-}
-
 function compute(event) {
   if (event) event.preventDefault();
   const params = readParams();
@@ -208,7 +139,6 @@ function compute(event) {
   const g2 = mulmod(G.y, G.y, curve.p);
   check.textContent = "G = " + pointToString(G) + " is on the curve: " + G.y + "² ≡ " + g2 + " ≡ " + G.x + "³ + " + curve.b + " (mod " + curve.p + ").";
   renderCurveInfo(curve, G, k);
-  renderBasePicker(curve, G);
 
   const dna = scalarMultiply(curve, k, G);
   const skipped = document.getElementById("naive-skipped");
@@ -226,15 +156,8 @@ function compute(event) {
   }
   renderPublicKey(k, dna.result);
   renderDoubleAndAdd(k, dna);
-  renderComparison(k, dna);
-  renderVisual(curve, G, k, dna);
+  renderVisual(curve, G, k);
 }
 
 document.getElementById("param-form").addEventListener("submit", compute);
-document.getElementById("in-base").addEventListener("change", event => {
-  if (!event.target.value) return;
-  const [x, y] = event.target.value.split(",").map(Number);
-  setBasePoint(x, y);
-});
-document.getElementById("btn-random-g").addEventListener("click", randomBasePoint);
 compute();

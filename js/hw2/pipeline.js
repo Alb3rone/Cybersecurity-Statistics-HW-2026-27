@@ -78,24 +78,18 @@ function hashWithTail(hex) {
   return wrap;
 }
 
-async function runPipeline(event) {
-  if (event) event.preventDefault();
+async function runPipeline() {
   const errorBox = document.getElementById("wallet-error");
   const list = document.getElementById("steps");
   const final = document.getElementById("final-address");
   errorBox.hidden = true;
   try {
-    const words = normalizeMnemonic(document.getElementById("in-words").value);
+    const words = normalizeMnemonic(TEST_VECTOR);
     const check = checkMnemonic(words);
-    if (!check.valid) throw new Error(check.reason);
-    const passphrase = document.getElementById("in-pass").value;
-    const account = Number(document.getElementById("in-account").value);
-    const index = Number(document.getElementById("in-index").value);
-    if (!Number.isInteger(account) || account < 0 || !Number.isInteger(index) || index < 0) throw new Error("Account and address index must be non-negative integers.");
-    const path = "m/44'/60'/" + account + "'/0/" + index;
+    const path = "m/44'/60'/0'/0/0";
 
     const t0 = performance.now();
-    const seed = await mnemonicToSeed(words, passphrase);
+    const seed = await mnemonicToSeed(words, "");
     const seedMs = performance.now() - t0;
     const derived = await derivePath(seed, path);
     const privateKey = derived.node.key;
@@ -133,7 +127,7 @@ async function runPipeline(event) {
       ]
     });
     const pathTable = el("span", "path-levels");
-    const levelNames = ["purpose 44'", "coin 60' (Ethereum)", "account " + account + "'", "change 0 (external)", "index " + index];
+    const levelNames = ["purpose 44'", "coin 60' (Ethereum)", "account 0'", "change 0 (external)", "index 0"];
     derived.steps.slice(1).forEach((s, i) => {
       const row = el("span", "path-level");
       row.append(el("span", "path-label", s.label), el("span", "path-name", levelNames[i]), el("span", "mono", shortHex(s.node.key.toString(16).padStart(64, "0"), 10)));
@@ -182,21 +176,14 @@ async function runPipeline(event) {
     });
 
     final.replaceChildren(el("span", "result-label", "ETHEREUM ADDRESS"), el("span", "result-value", checksum.address));
-    if (words.join(" ") === TEST_VECTOR && !passphrase && account === 0 && index === 0) {
-      final.append(el("span", "result-note", checksum.address === "0x9858EfFD232B4033E47d90003D41EC34EcaEda94"
-        ? "Matches the address MetaMask shows for the test vector."
-        : "Does not match the known test-vector address."));
-    }
+    final.append(el("span", "result-note", checksum.address === "0x9858EfFD232B4033E47d90003D41EC34EcaEda94"
+      ? "Matches the address MetaMask shows for the test vector."
+      : "Does not match the known test-vector address."));
     document.dispatchEvent(new CustomEvent("wallet:derived", { detail: { seed } }));
   } catch (error) {
     errorBox.textContent = error.message;
     errorBox.hidden = false;
   }
-}
-
-function newPhrase(bytes) {
-  document.getElementById("in-words").value = entropyToMnemonic(randomBytes(bytes)).words.join(" ");
-  runPipeline();
 }
 
 function renderHashDemo() {
@@ -206,27 +193,11 @@ function renderHashDemo() {
   list.replaceChildren();
   const kec = keccak256(bytes);
   const sha3 = sha3_256(bytes);
-  for (const [name, digest] of [["SHA-256", sha256(bytes)], ["Keccak-256", kec], ["SHA3-256", sha3]]) {
+  for (const [name, digest] of [["Keccak-256", kec], ["SHA3-256", sha3]]) {
     list.append(el("dt", "", name), el("dd", "mono", bytesToHex(digest)));
   }
-  let differing = 0;
-  for (let i = 0; i < 32; i++) {
-    let x = kec[i] ^ sha3[i];
-    while (x) { x &= x - 1; differing++; }
-  }
-  list.append(el("dt", "", "Keccak vs SHA3"), el("dd", "", differing + " of 256 bits differ, the same as two unrelated random strings (about 128 expected)."));
 }
 
-document.getElementById("wallet-form").addEventListener("submit", runPipeline);
-document.getElementById("btn-new12").addEventListener("click", () => newPhrase(16));
-document.getElementById("btn-new24").addEventListener("click", () => newPhrase(32));
-document.getElementById("btn-vector").addEventListener("click", () => {
-  document.getElementById("in-words").value = TEST_VECTOR;
-  document.getElementById("in-pass").value = "";
-  document.getElementById("in-account").value = 0;
-  document.getElementById("in-index").value = 0;
-  runPipeline();
-});
 document.getElementById("in-hash").addEventListener("input", renderHashDemo);
 renderHashDemo();
 runPipeline();

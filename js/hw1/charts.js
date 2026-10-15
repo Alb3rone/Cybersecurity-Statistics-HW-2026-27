@@ -102,24 +102,3 @@ function barChart(container, options) {
     svg.append(chartSvg("text", { x: CHART_W - CHART_PAD.right, y: CHART_PAD.top + 10, class: "reference-label", "text-anchor": "end" }, referenceLabel));
   }
 }
-
-function scatterChart(container, options) {
-  const { title, points, xMax, yMax, xTitle, yTitle } = options;
-  CHART_W = options.width || 640;
-  const svg = chartFrame(container, title);
-  const yTop = yMax;
-  drawAxes(svg, yTop, null, xTitle, yTitle);
-  const plotW = CHART_W - CHART_PAD.left - CHART_PAD.right;
-  const plotH = CHART_H - CHART_PAD.top - CHART_PAD.bottom;
-  const xTop = xMax;
-  for (let i = 0; i <= 4; i++) {
-    const x = CHART_PAD.left + plotW * i / 4;
-    svg.append(chartSvg("text", { x, y: CHART_PAD.top + plotH + 16, class: "tick", "text-anchor": "middle" }, formatTick(Math.round(xTop * i / 4))));
-  }
-  const r = points.length > 2000 ? 1.4 : points.length > 300 ? 2 : 3.5;
-  for (const [x, y] of points) {
-    const dot = chartSvg("circle", { cx: CHART_PAD.left + plotW * x / xTop, cy: CHART_PAD.top + plotH - plotH * y / yTop, r, class: "dot" });
-    if (points.length <= 300) dot.append(chartSvg("title", {}, "(" + x + ", " + y + ")"));
-    svg.append(dot);
-  }
-}

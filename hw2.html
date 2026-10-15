@@ -22,30 +22,9 @@
       <h2><span class="sec-num">1</span> The pipeline, step by step</h2>
       <p class="note">
         The default phrase is the public BIP-39 test vector <span class="math">abandon … about</span>. Importing it in
-        MetaMask, Rabby or any BIP-44 wallet shows the same first address as step 10. Never send funds to it: the
-        phrase is public. New phrases generated here use the browser's cryptographic random generator but are only
-        for study.
+        MetaMask, Rabby or any BIP-44 wallet shows the same first address as step 10, on the path
+        <span class="math">m/44'/60'/0'/0/0</span> with an empty passphrase. Never send funds to it: the phrase is public.
       </p>
-      <form id="wallet-form" class="wallet-form" novalidate>
-        <label for="in-words" class="wide">Mnemonic phrase
-          <textarea id="in-words" rows="3" spellcheck="false" autocomplete="off">abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about</textarea>
-        </label>
-        <label for="in-pass">Passphrase <span class="hint">optional, BIP-39 "25th word"</span>
-          <input id="in-pass" type="text" autocomplete="off" value="">
-        </label>
-        <label for="in-account">Account <span class="hint">BIP-44 level 3</span>
-          <input id="in-account" type="number" min="0" step="1" value="0">
-        </label>
-        <label for="in-index">Address index <span class="hint">BIP-44 level 5</span>
-          <input id="in-index" type="number" min="0" step="1" value="0">
-        </label>
-        <div class="form-buttons wide">
-          <button id="btn-derive" type="submit">Derive address</button>
-          <button id="btn-new12" type="button" class="secondary">New 12-word phrase</button>
-          <button id="btn-new24" type="button" class="secondary">New 24-word phrase</button>
-          <button id="btn-vector" type="button" class="secondary">Test vector</button>
-        </div>
-      </form>
       <p id="wallet-error" class="error" role="alert" hidden></p>
       <ol id="steps" class="pipeline"></ol>
       <div id="final-address" class="result" aria-live="polite"></div>
@@ -137,7 +116,7 @@
       </div>
       <p class="note">
         Keccak-256 and SHA3-256 run the same permutation and differ only in the padding byte, yet their outputs are
-        completely unrelated. Type something to compare the three functions:
+        completely unrelated. Type something to compare them:
       </p>
       <label for="in-hash" class="hash-label">Input string
         <input id="in-hash" type="text" value="" placeholder="empty string" autocomplete="off">
@@ -166,17 +145,9 @@
     <section id="stats">
       <h2><span class="sec-num">7</span> Statistical properties</h2>
       <p class="note">
-        Each experiment checks a property that one of the primitives is supposed to have. The tests run in the browser
-        when the page opens; press the button to repeat them with new random data.
+        The tests run in the browser when the page opens; press the button to repeat them with new random messages.
       </p>
       <div class="stats-controls">
-        <label for="st-addresses">Addresses to derive
-          <select id="st-addresses">
-            <option value="200">200</option>
-            <option value="500" selected>500</option>
-            <option value="1000">1000</option>
-          </select>
-        </label>
         <button id="st-run" type="button">Run again</button>
       </div>
       <p id="st-status" class="status" aria-live="polite"></p>
@@ -188,43 +159,15 @@
       <p id="st-aval-text" class="finding"></p>
 
       <h3>7.2 Uniformity of addresses</h3>
-      <p class="note">Addresses are derived from the phrase in section 1 along m/44'/60'/0'/0/i. If Keccak-256 output is uniform, each of the 16 hexadecimal digits appears with probability 1/16 and each of the 160 address bits is 1 half of the time.</p>
+      <p class="note">The first 100 addresses of the test phrase, m/44'/60'/0'/0/0 … 99, are derived. If Keccak-256 output is uniform, each of the 16 hexadecimal digits appears with probability 1/16 and each of the 160 address bits is 1 half of the time.</p>
       <div class="chart-grid">
         <div id="ch-nibbles"></div>
         <div id="ch-bits"></div>
       </div>
-      <div id="st-uniform" class="table-wrap"></div>
       <p id="st-uniform-text" class="finding"></p>
 
-      <h3>7.3 Independence of derived keys</h3>
-      <p class="note">BIP-32 child keys for consecutive indexes i and i + 1 are compared bit by bit. If HMAC-SHA512 behaves like a random function, about 128 of the 256 bits differ, even though the indexes differ by one.</p>
-      <div id="ch-children"></div>
-      <p id="st-children-text" class="finding"></p>
-
-      <h3>7.4 Checksums: how many errors are detected</h3>
-      <div class="chart-grid">
-        <div id="ch-letters"></div>
-        <div id="ch-upper"></div>
-      </div>
-      <div id="st-check" class="table-wrap"></div>
-      <p id="st-check-text" class="finding"></p>
-
-      <h3>7.5 Summary</h3>
-      <div class="table-wrap">
-        <table class="props">
-          <thead>
-            <tr><th scope="col">Primitive</th><th scope="col">Statistical property expected</th><th scope="col">Measured on this page</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Entropy (generation)</td><td>Uniform random bits: every phrase equally likely</td><td>Comes from the browser's cryptographic generator; not testable from a single phrase, which is why it must be trusted.</td></tr>
-            <tr><td>BIP-39 checksum</td><td>A random word sequence passes with probability 2<sup>−CS</sup></td><td id="sum-bip39"></td></tr>
-            <tr><td>PBKDF2 / HMAC-SHA512</td><td>Child keys look independent of each other</td><td id="sum-hmac"></td></tr>
-            <tr><td>secp256k1</td><td>Structure on purpose (HMWK 1); no uniformity required</td><td>Q(k₁) + Q(k₂) = Q(k₁ + k₂); this structure is removed by the next step.</td></tr>
-            <tr><td>Keccak-256</td><td>Avalanche, uniform digits and bits</td><td id="sum-keccak"></td></tr>
-            <tr><td>EIP-55</td><td>Each letter uppercase with probability ½; a changed digit passes with probability 2<sup>−letters</sup></td><td id="sum-eip55"></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3>7.3 EIP-55 capital letters</h3>
+      <p id="st-eip55-text" class="finding"></p>
     </section>
   </main>
 
