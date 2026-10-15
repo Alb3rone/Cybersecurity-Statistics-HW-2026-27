@@ -41,37 +41,6 @@ function addStep(list, { title, standard, chips, text, values }) {
   list.append(li);
 }
 
-function mnemonicNode(check, words) {
-  const wrap = el("span", "words");
-  const csStart = check.bits.length - check.checksumBits;
-  words.forEach((w, i) => {
-    const bits = check.bits.slice(11 * i, 11 * i + 11);
-    const word = el("span", "word");
-    word.append(el("span", "word-text", w));
-    const bitSpan = el("span", "word-bits");
-    for (let b = 0; b < 11; b++) {
-      const s = el("span", 11 * i + b >= csStart ? "cs-bit" : "", bits[b]);
-      bitSpan.append(s);
-    }
-    word.append(el("span", "word-index", "#" + check.indexes[i]), bitSpan);
-    wrap.append(word);
-  });
-  return wrap;
-}
-
-function addressNode(lower, checksummed, hash) {
-  const wrap = el("span", "addr-chars");
-  wrap.append(el("span", "", "0x"));
-  for (let i = 0; i < lower.length; i++) {
-    const c = checksummed[i + 2];
-    const isLetter = /[a-f]/i.test(c);
-    const span = el("span", isLetter ? (c === c.toUpperCase() ? "upper" : "lower") : "digit", c);
-    span.title = isLetter ? "hash digit " + hash[i] + (parseInt(hash[i], 16) >= 8 ? " ≥ 8 → uppercase" : " < 8 → lowercase") : "digit, no case";
-    wrap.append(span);
-  }
-  return wrap;
-}
-
 function hashWithTail(hex) {
   const wrap = el("span", "");
   wrap.append(el("span", "dim", hex.slice(0, 24)), el("span", "tail", hex.slice(24)));
@@ -99,55 +68,39 @@ async function runPipeline() {
     list.replaceChildren();
     const entBits = check.entropy.length * 8;
     addStep(list, {
-      title: "Entropy", standard: "BIP-39", chips: ["gen"],
-      text: entBits + " random bits. This is the only random input of the whole wallet: everything below is computed from it. " +
-        "The search space is 2^" + entBits + " ≈ 10^" + Math.round(entBits * Math.log10(2)) + " phrases.",
-      values: [{ label: "hex", value: bytesToHex(check.entropy), className: "mono" }]
-    });
-    addStep(list, {
-      title: "Mnemonic", standard: "BIP-39", chips: ["enc", "sum"],
-      text: "The first " + check.checksumBits + " bits of SHA-256(entropy) are appended as a checksum (highlighted), then every 11 bits " +
-        "select one of 2048 words. " + words.length + " words × 11 bits = " + entBits + " + " + check.checksumBits + " bits.",
-      values: [{ label: "words", node: mnemonicNode(check, words) }]
+      title: "Entropy and mnemonic", standard: "BIP-39", chips: ["gen", "sum", "enc"],
+      text: entBits + " random bits, plus the first " + check.checksumBits + " bits of SHA-256(entropy) as a checksum. " +
+        "Every 11 bits select one of 2048 words: " + words.length + " × 11 = " + entBits + " + " + check.checksumBits + " bits.",
+      values: [
+        { label: "entropy", value: bytesToHex(check.entropy), className: "mono" },
+        { label: "words", value: words.join(" "), className: "mono" }
+      ]
     });
     addStep(list, {
       title: "Seed", standard: "BIP-39", chips: ["der"],
-      text: "PBKDF2-HMAC-SHA512 with 2048 iterations, salt \"mnemonic\" + passphrase. The repetition is key stretching: " +
-        "it took " + seedMs.toFixed(1) + " ms here, and every guess of an attacker costs the same. A different passphrase gives a completely different wallet.",
+      text: "PBKDF2-HMAC-SHA512 with 2048 iterations and salt \"mnemonic\" + passphrase. The repetition makes every guess of an attacker slower.",
       values: [{ label: "512 bits", value: bytesToHex(seed), className: "mono" }]
     });
-    const master = derived.steps[0].node;
-    addStep(list, {
-      title: "Master key", standard: "BIP-32", chips: ["der"],
-      text: "HMAC-SHA512 with key \"Bitcoin seed\": the left 256 bits are the master private key, the right 256 bits the chain code, " +
-        "which is extra secret material needed to derive children.",
-      values: [
-        { label: "private key", value: bigToBytes(master.key, 32).reduce((s, b) => s + b.toString(16).padStart(2, "0"), ""), className: "mono" },
-        { label: "chain code", value: bytesToHex(master.chainCode), className: "mono" }
-      ]
-    });
     const pathTable = el("span", "path-levels");
-    const levelNames = ["purpose 44'", "coin 60' (Ethereum)", "account 0'", "change 0 (external)", "index 0"];
-    derived.steps.slice(1).forEach((s, i) => {
+    derived.steps.forEach(s => {
       const row = el("span", "path-level");
-      row.append(el("span", "path-label", s.label), el("span", "path-name", levelNames[i]), el("span", "mono", shortHex(s.node.key.toString(16).padStart(64, "0"), 10)));
+      row.append(el("span", "path-label", s.label), el("span", "mono", shortHex(s.node.key.toString(16).padStart(64, "0"), 10)));
       pathTable.append(row);
     });
     addStep(list, {
       title: "Derivation path " + path, standard: "BIP-32 / BIP-44", chips: ["der"],
-      text: "Each level is a child key: HMAC-SHA512(chain code, parent data ‖ index), left half added to the parent key mod n. " +
-        "Levels with ' are hardened: they use the parent private key, so a leaked child key and the parent public key cannot reveal siblings.",
-      values: [{ label: "levels", node: pathTable }]
+      text: "The master key is HMAC-SHA512(\"Bitcoin seed\", seed); every level below is a child key computed with HMAC-SHA512 from its parent. " +
+        "Levels marked with ' are hardened.",
+      values: [{ label: "keys", node: pathTable }]
     });
     addStep(list, {
       title: "Private key", standard: "BIP-32", chips: ["der"],
-      text: "The 256-bit number k at the end of the path. In MetaMask this is what \"export private key\" shows.",
+      text: "The 256-bit number k at the end of the path.",
       values: [{ label: "k", value: privateKey.toString(16).padStart(64, "0"), className: "mono" }]
     });
     addStep(list, {
       title: "Public key", standard: "secp256k1", chips: ["pkc"],
-      text: "Q = kG on y² = x³ + 7 over a 256-bit prime field, the same scalar multiplication as HMWK 1. " +
-        "Ethereum uses the 64 bytes x ‖ y.",
+      text: "Q = kG, the same scalar multiplication as HMWK 1 on a 256-bit curve. Ethereum uses the 64 bytes x ‖ y.",
       values: [
         { label: "x", value: bytesToHex(pub.slice(0, 32)), className: "mono" },
         { label: "y", value: bytesToHex(pub.slice(32)), className: "mono" }
@@ -155,24 +108,18 @@ async function runPipeline() {
     });
     addStep(list, {
       title: "Keccak-256 of the public key", standard: "Keccak-256", chips: ["hash"],
-      text: "The 64 bytes are hashed to 32 bytes. Only the last 20 bytes (highlighted) are kept.",
+      text: "The 64 bytes are hashed to 32 bytes; the last 20 bytes (highlighted) are kept.",
       values: [{ label: "digest", node: hashWithTail(bytesToHex(hash)), className: "mono" }]
     });
     addStep(list, {
       title: "Address", standard: "Ethereum", chips: ["enc"],
-      text: "20 bytes written as 40 hexadecimal digits with the prefix 0x.",
+      text: "The 20 bytes written as 40 hexadecimal digits with the prefix 0x.",
       values: [{ label: "lowercase", value: "0x" + address, className: "mono" }]
     });
-    const upper = (checksum.address.match(/[A-F]/g) || []).length;
-    const letters = (address.match(/[a-f]/g) || []).length;
     addStep(list, {
       title: "Checksummed address", standard: "EIP-55", chips: ["sum", "enc"],
-      text: "Keccak-256 of the 40 lowercase characters gives one hex digit per character: when that digit is 8 or more the letter is " +
-        "uppercased. This address has " + letters + " letters, " + upper + " uppercase. Hover a character to see its hash digit.",
-      values: [
-        { label: "hash of text", value: checksum.hash.slice(0, 40), className: "mono dim" },
-        { label: "EIP-55", node: addressNode(address, checksum.address, checksum.hash), className: "mono" }
-      ]
+      text: "A letter is uppercased when the matching hex digit of Keccak-256(lowercase address) is 8 or more.",
+      values: [{ label: "EIP-55", value: checksum.address, className: "mono" }]
     });
 
     final.replaceChildren(el("span", "result-label", "ETHEREUM ADDRESS"), el("span", "result-value", checksum.address));

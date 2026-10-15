@@ -125,10 +125,6 @@ function keccakAvalanche() {
     reference: bins.expected, referenceLabel: "— Binomial(256, ½)", yFormat: "percent",
     xTitle: "number of changed bits out of 256", yTitle: "share of trials"
   });
-  table("st-aval", ["", "trials", "mean", "std. dev.", "min", "max"], [
-    ["Keccak-256 measured", String(s.n), f(s.mean), f(s.sd), String(s.min), String(s.max)],
-    ["ideal Binomial(256, ½)", "–", "128.00", "8.00", "–", "–"]
-  ]);
   say("st-aval-text",
     "On average " + f(s.mean, 1) + " of 256 bits change (" + pct(s.mean / 256) + "), with standard deviation " + f(s.sd, 2) +
     " against the ideal 8: the histogram follows the binomial curve, so a one-bit change of the input gives an unpredictable new digest.");

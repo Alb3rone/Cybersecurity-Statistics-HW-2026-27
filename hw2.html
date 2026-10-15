@@ -22,7 +22,7 @@
       <h2><span class="sec-num">1</span> The pipeline, step by step</h2>
       <p class="note">
         The default phrase is the public BIP-39 test vector <span class="math">abandon … about</span>. Importing it in
-        MetaMask, Rabby or any BIP-44 wallet shows the same first address as step 10, on the path
+        MetaMask, Rabby or any BIP-44 wallet shows the same first address as the last step, on the path
         <span class="math">m/44'/60'/0'/0/0</span> with an empty passphrase. Never send funds to it: the phrase is public.
       </p>
       <p id="wallet-error" class="error" role="alert" hidden></p>
@@ -35,15 +35,15 @@
       <div class="table-wrap">
         <table class="props">
           <thead>
-            <tr><th scope="col">Standard</th><th scope="col">Year</th><th scope="col">Input → output</th><th scope="col">Primitive inside</th><th scope="col">Kind of operation</th><th scope="col">Purpose</th></tr>
+            <tr><th scope="col">Standard</th><th scope="col">Year</th><th scope="col">Role</th><th scope="col">Kind of operation</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>BIP-39</strong></td><td class="num">2013</td><td>128–256 random bits → 12–24 words → 512-bit seed</td><td>SHA-256 (checksum), PBKDF2-HMAC-SHA512 with 2048 iterations</td><td><span class="chip c-gen">generation</span> <span class="chip c-enc">encoding</span> <span class="chip c-sum">checksum</span> <span class="chip c-der">derivation</span></td><td>Lets a person write down and re-type the wallet's master secret, detecting most typing mistakes.</td></tr>
-            <tr><td><strong>BIP-32</strong></td><td class="num">2012</td><td>seed → master key and chain code → child keys</td><td>HMAC-SHA512, addition mod n on secp256k1</td><td><span class="chip c-der">derivation</span></td><td>One backup produces a whole tree of independent-looking keys (hierarchical deterministic wallet).</td></tr>
-            <tr><td><strong>BIP-44</strong></td><td class="num">2014</td><td>convention m / 44' / coin' / account' / change / index</td><td>none, it is a naming rule over BIP-32</td><td><span class="chip c-der">derivation</span> (convention)</td><td>Different wallets find the same keys from the same phrase; coin type 60 is Ethereum.</td></tr>
-            <tr><td><strong>secp256k1</strong></td><td class="num">2000</td><td>private key k → public key Q = kG</td><td>elliptic-curve scalar multiplication (HMWK 1)</td><td><span class="chip c-pkc">public-key crypto</span></td><td>Links the secret key to a public key; used to sign transactions (ECDSA).</td></tr>
-            <tr><td><strong>Keccak-256</strong></td><td class="num">2008 / 2012</td><td>64-byte public key → 32-byte digest, last 20 bytes = address</td><td>Keccak-f[1600] sponge</td><td><span class="chip c-hash">hashing</span></td><td>Compresses the public key into a short, uniform-looking identifier.</td></tr>
-            <tr><td><strong>EIP-55</strong></td><td class="num">2016</td><td>lowercase hex address → mixed-case address</td><td>Keccak-256 of the address text</td><td><span class="chip c-sum">checksum</span> <span class="chip c-enc">encoding</span></td><td>Detects typing errors without changing the address or its length.</td></tr>
+            <tr><td><strong>BIP-39</strong></td><td class="num">2013</td><td>Random bits → 12–24 words with a SHA-256 checksum → 512-bit seed with PBKDF2-HMAC-SHA512 (2048 iterations).</td><td><span class="chip c-gen">generation</span> <span class="chip c-enc">encoding</span> <span class="chip c-sum">checksum</span> <span class="chip c-der">derivation</span></td></tr>
+            <tr><td><strong>BIP-32</strong></td><td class="num">2012</td><td>Seed → master key and chain code → tree of child keys, using HMAC-SHA512.</td><td><span class="chip c-der">derivation</span></td></tr>
+            <tr><td><strong>BIP-44</strong></td><td class="num">2014</td><td>Naming rule for the tree: m / 44' / coin' / account' / change / index, with coin 60 for Ethereum.</td><td><span class="chip c-der">derivation</span> (convention)</td></tr>
+            <tr><td><strong>secp256k1</strong></td><td class="num">2000</td><td>Private key k → public key Q = kG; also used to sign transactions (ECDSA).</td><td><span class="chip c-pkc">public-key crypto</span></td></tr>
+            <tr><td><strong>Keccak-256</strong></td><td class="num">2012</td><td>64-byte public key → 32-byte digest; the last 20 bytes are the address.</td><td><span class="chip c-hash">hashing</span></td></tr>
+            <tr><td><strong>EIP-55</strong></td><td class="num">2016</td><td>Lowercase address → mixed-case address that detects typing errors.</td><td><span class="chip c-sum">checksum</span> <span class="chip c-enc">encoding</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -80,22 +80,14 @@
       <h2><span class="sec-num">4</span> Historical context</h2>
       <ol class="timeline">
         <li><span class="year">1977</span><span class="event"><strong>RSA</strong>: first practical public-key cryptosystem.</span></li>
-        <li><span class="year">1985</span><span class="event"><strong>Elliptic-curve cryptography</strong> proposed independently by Koblitz and Miller.</span></li>
         <li><span class="year">2000</span><span class="event"><strong>secp256k1</strong> published in SEC 2; later chosen by Bitcoin (2009) and Ethereum.</span></li>
         <li><span class="year">2001</span><span class="event"><strong>SHA-2</strong> (SHA-256, SHA-512) standardized by NIST.</span></li>
-        <li><span class="year">2008</span><span class="event"><strong>Keccak</strong> submitted to the NIST SHA-3 competition; it wins in 2012.</span></li>
-        <li><span class="year">2012</span><span class="event"><strong>BIP-32</strong>: hierarchical deterministic wallets.</span></li>
+        <li><span class="year">2012</span><span class="event"><strong>BIP-32</strong>: hierarchical deterministic wallets; NIST picks <strong>Keccak</strong> as SHA-3.</span></li>
         <li><span class="year">2013</span><span class="event"><strong>BIP-39</strong>: mnemonic code for the seed.</span></li>
         <li><span class="year">2014</span><span class="event"><strong>BIP-44</strong>: standard multi-account derivation paths.</span></li>
         <li><span class="year">2015</span><span class="event"><strong>Ethereum</strong> launches in July with Keccak-256; in August NIST publishes <strong>SHA-3</strong> (FIPS 202) with a different padding.</span></li>
         <li><span class="year">2016</span><span class="event"><strong>EIP-55</strong>: mixed-case checksum addresses.</span></li>
       </ol>
-      <p class="note">
-        The primitives are old and well studied (RSA 1977, ECC 1985, SHA-2 2001), while the wallet standards on top of
-        them are recent and come from the Bitcoin community (2012–2014). Ethereum adopted them and added only what it
-        needed: Keccak-256 addresses and the EIP-55 checksum. Because Ethereum fixed its hash function while SHA-3 was
-        still being finalized, it kept the original Keccak padding.
-      </p>
     </section>
 
     <section id="sha">
@@ -106,9 +98,7 @@
             <tr><th scope="col"></th><th scope="col">SHA-2 (SHA-256, SHA-512)</th><th scope="col">Keccak-256 (Ethereum)</th><th scope="col">SHA3-256 (FIPS 202)</th></tr>
           </thead>
           <tbody>
-            <tr><td>Designed by</td><td>NSA, standardized by NIST in 2001</td><td>Bertoni, Daemen, Peeters, Van Assche</td><td>same design, standardized by NIST in 2015</td></tr>
             <tr><td>Construction</td><td>Merkle–Damgård: a compression function applied block after block</td><td colspan="2">Sponge: data is absorbed into a 1600-bit state and the digest is squeezed out</td></tr>
-            <tr><td>Length-extension attack</td><td>Possible: H(m) lets an attacker compute H(m ‖ pad ‖ x)</td><td colspan="2">Not possible: part of the state (the capacity) is never output</td></tr>
             <tr><td>Padding / domain byte</td><td>1, zeros, message length</td><td>0x01 … 0x80</td><td>0x06 … 0x80</td></tr>
             <tr><td>Used in this pipeline</td><td>SHA-256: BIP-39 checksum. SHA-512: PBKDF2 and BIP-32 HMAC</td><td>Address and EIP-55</td><td>Not used by Ethereum</td></tr>
           </tbody>
@@ -155,7 +145,6 @@
       <h3>7.1 Keccak-256: avalanche effect</h3>
       <p class="note">Random 32-byte messages are hashed, one random bit is flipped, and the two digests are compared. For an ideal hash each of the 256 output bits changes with probability ½, so the number of changed bits follows a Binomial(256, ½): mean 128, standard deviation 8.</p>
       <div id="ch-aval"></div>
-      <div id="st-aval" class="table-wrap"></div>
       <p id="st-aval-text" class="finding"></p>
 
       <h3>7.2 Uniformity of addresses</h3>

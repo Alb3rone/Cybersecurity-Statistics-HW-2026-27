@@ -329,30 +329,11 @@ table.props td { white-space: normal; vertical-align: top; min-width: 140px; }
 .c-pkc { --chip: var(--accent); }
 .c-hash { --chip: var(--c-hash); }
 
-.words { display: flex; flex-wrap: wrap; gap: 6px; }
-.word {
-  display: grid;
-  gap: 1px;
-  padding: 4px 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg);
-  min-width: 0;
-}
-.word-text { font-weight: 600; }
-.word-index { font: 0.7rem var(--font-mono); color: var(--ink-3); }
-.word-bits { font: 0.7rem var(--font-mono); color: var(--ink-2); letter-spacing: 0.02em; }
-.cs-bit { color: var(--c-sum); font-weight: 700; }
 .path-levels { display: grid; gap: 4px; }
-.path-level { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 11rem) minmax(0, 1fr); gap: 8px; font-size: 0.85rem; }
+.path-level { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 8px; font-size: 0.85rem; }
 .path-label { font-family: var(--font-mono); font-weight: 600; overflow-wrap: anywhere; }
-.path-name { color: var(--ink-2); }
 .dim { color: var(--ink-3); }
 .tail { color: var(--c-hash); font-weight: 700; }
-.addr-chars { font-family: var(--font-mono); font-size: 1rem; overflow-wrap: anywhere; word-break: break-all; }
-.addr-chars .upper { color: var(--c-hash); font-weight: 700; }
-.addr-chars .lower { color: var(--accent); }
-.addr-chars .digit { color: var(--ink-3); }
 .result-note { flex-basis: 100%; color: var(--good); font-size: 0.9rem; }
 #final-address .result-value { overflow-wrap: anywhere; font-size: 1.1rem; }
 
