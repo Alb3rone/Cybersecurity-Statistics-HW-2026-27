@@ -368,3 +368,25 @@ table.props td { white-space: normal; vertical-align: top; min-width: 140px; }
   .timeline li { grid-template-columns: 3.2rem 1fr; }
   section { padding: 16px 14px; }
 }
+
+.msg-label { display: grid; gap: 4px; font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; }
+textarea {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--ink);
+  width: 100%;
+  resize: vertical;
+}
+textarea:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.param-form .wide-field { grid-column: span 2; }
+.algo { margin: 0; padding-left: 1.4rem; display: grid; gap: 8px; max-width: 75ch; }
+.result-text { font-family: var(--font-mono); overflow-wrap: anywhere; flex-basis: 100%; }
+.result-note.bad { color: var(--bad); }
+#caesar-out dd { overflow-wrap: anywhere; }
+#ecc-keys dd { overflow-wrap: anywhere; word-break: break-all; }
+.table-wrap + .chart-grid { margin-top: 16px; }

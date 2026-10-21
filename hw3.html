@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 3 – ElGamal on secp256k1 and the Caesar cipher</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 3 · toy ECC and Caesar</p>
+    <h1>ElGamal on secp256k1 and the Caesar cipher</h1>
+    <p class="lead">
+      The same message is encrypted with a toy public-key scheme built on the secp256k1 curve of the previous
+      homework and with the Caesar cipher. Both schemes are then compared and attacked: the Caesar cipher through
+      the statistics of the language, the toy scheme through its small private-key space.
+    </p>
+  </header>
+
+  <main>
+    <section id="message">
+      <h2><span class="sec-num">1</span> Message</h2>
+      <label for="in-message" class="msg-label">Plaintext used by both schemes
+        <textarea id="in-message" rows="3" spellcheck="false">Meet me at the north gate of the old harbour at midnight and bring the second set of keys.</textarea>
+      </label>
+      <button id="btn-run" type="button">Encrypt and decrypt</button>
+    </section>
+
+    <section id="ecc">
+      <h2><span class="sec-num">2</span> Toy ElGamal on secp256k1</h2>
+      <p class="note">
+        The curve is the real secp256k1, <span class="math">y² = x³ + 7</span> over a 256-bit prime p, with base point G
+        of prime order n. The only toy element is the private key d, which is restricted to
+        <span class="math">1 ≤ d &lt; 2^b</span> so that the attack in section 5 can run in the browser.
+      </p>
+      <form id="key-form" class="param-form" novalidate>
+        <label for="in-bits"><span class="lbl">b</span> <span class="hint">private key bits (8–24)</span>
+          <input id="in-bits" type="number" min="8" max="24" step="1" value="20">
+        </label>
+        <label for="in-d" class="wide-field"><span class="lbl">d</span> <span class="hint">private key</span>
+          <input id="in-d" type="text" inputmode="numeric" autocomplete="off">
+        </label>
+        <button id="btn-newkey" type="button" class="secondary">New private key</button>
+      </form>
+      <p id="key-error" class="error" role="alert" hidden></p>
+
+      <h3>The algorithm and the role of the keys</h3>
+      <ol class="algo">
+        <li><strong>Key generation (receiver).</strong> Choose the private key d at random and publish the public key
+          <span class="math">Q = dG</span>. d stays secret and is the only thing needed to decrypt; Q lets anyone encrypt for the receiver.</li>
+        <li><strong>Encoding.</strong> The message is split into blocks of 30 bytes. A block, read as an integer m, becomes the
+          x-coordinate <span class="math">x = 256·m + j</span>, where j is the first value in 0 … 255 for which
+          <span class="math">x³ + 7</span> is a square mod p. This gives a point M on the curve.</li>
+        <li><strong>Encryption (sender).</strong> For each block pick a fresh random ephemeral key r in 1 … n − 1 and send the pair
+          <span class="math">C₁ = rG, C₂ = M + rQ</span>. The point rQ is a one-time mask that only the sender and the receiver can compute.</li>
+        <li><strong>Decryption (receiver).</strong> Compute <span class="math">dC₁ = d·rG = r·dG = rQ</span> and remove the mask:
+          <span class="math">M = C₂ − dC₁</span>, then <span class="math">m = ⌊x / 256⌋</span>.</li>
+      </ol>
+
+      <h3>Keys</h3>
+      <dl id="ecc-keys" class="facts"></dl>
+      <h3>Ciphertext</h3>
+      <div id="ecc-table" class="table-wrap"></div>
+      <div id="ecc-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="caesar">
+      <h2><span class="sec-num">3</span> Caesar cipher</h2>
+      <p class="note">
+        Each letter is replaced by the letter k positions later in the alphabet, wrapping from Z to A:
+        <span class="math">c = (p + k) mod 26</span>. Decryption shifts back, <span class="math">p = (c − k) mod 26</span>.
+        Case is kept, spaces and punctuation are left unchanged. The same key k is used to encrypt and to decrypt.
+      </p>
+      <form id="caesar-form" class="param-form" novalidate>
+        <label for="in-shift"><span class="lbl">k</span> <span class="hint">shift (1–25)</span>
+          <input id="in-shift" type="number" min="1" max="25" step="1" value="11">
+        </label>
+      </form>
+      <dl id="caesar-out" class="facts"></dl>
+      <div id="caesar-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="compare">
+      <h2><span class="sec-num">4</span> Comparing the two schemes</h2>
+      <div class="table-wrap">
+        <table class="props">
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Caesar cipher</th><th scope="col">Toy ElGamal on secp256k1</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Type</td><td>Symmetric: one shared secret key</td><td>Asymmetric: public key Q to encrypt, private key d to decrypt</td></tr>
+            <tr><td>Unit of encryption</td><td>Single letter</td><td>Block of 30 bytes encoded as a curve point</td></tr>
+            <tr><td>Encryption</td><td><span class="math">c = (p + k) mod 26</span></td><td><span class="math">C₁ = rG, C₂ = M + rQ</span></td></tr>
+            <tr><td>Decryption</td><td><span class="math">p = (c − k) mod 26</span>, the inverse operation with the same key</td><td><span class="math">M = C₂ − dC₁</span>, with a different key than encryption</td></tr>
+            <tr><td>Common idea</td><td colspan="2">Both add a secret "mask" to the message in a group (letters mod 26, points of the curve) and decryption subtracts it</td></tr>
+            <tr><td>Randomness</td><td>None: the same letter always gives the same letter</td><td>Fresh r per block: the same message gives a different ciphertext every time</td></tr>
+            <tr><td>Ciphertext size</td><td>Same as the plaintext</td><td>Four 256-bit numbers per block of 30 bytes, about 4 times larger</td></tr>
+            <tr><td>Key space</td><td>26 shifts, 25 useful (under 5 bits)</td><td>Here <span class="math">2^b − 1</span> values of d; for real secp256k1 about 2²⁵⁶</td></tr>
+            <tr><td>Statistical properties</td><td>Letter frequencies are kept, only moved by k positions</td><td>Ciphertext coordinates look uniform and do not depend on the letters of the message</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-grid">
+        <div id="ch-letters"></div>
+        <div id="ch-hex"></div>
+      </div>
+      <p id="compare-text" class="finding"></p>
+    </section>
+  </main>
+
+  <script src="js/hw1/charts.js"></script>
+  <script src="js/hw2/secp256k1.js"></script>
+  <script src="js/hw3/elgamal.js"></script>
+  <script src="js/hw3/caesar.js"></script>
+  <script src="js/hw3/schemes.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
