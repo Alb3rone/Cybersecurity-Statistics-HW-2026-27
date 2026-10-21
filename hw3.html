@@ -31,7 +31,7 @@
       <p class="note">
         The curve is the real secp256k1, <span class="math">y² = x³ + 7</span> over a 256-bit prime p, with base point G
         of prime order n. The only toy element is the private key d, which is restricted to
-        <span class="math">1 ≤ d &lt; 2^b</span> so that the attack in section 5 can run in the browser.
+        <span class="math">1 ≤ d &lt; 2^b</span> so that the attack in section 6 can run in the browser.
       </p>
       <form id="key-form" class="param-form" novalidate>
         <label for="in-bits"><span class="lbl">b</span> <span class="hint">private key bits (8–24)</span>
@@ -106,6 +106,54 @@
       </div>
       <p id="compare-text" class="finding"></p>
     </section>
+
+    <section id="cryptanalysis">
+      <h2><span class="sec-num">5</span> Statistical cryptanalysis of the Caesar cipher</h2>
+      <p class="note">
+        A Caesar key moves every letter by the same amount, so the ciphertext keeps the letter distribution of the
+        language, only shifted. The attack builds the distribution of English from a corpus and then, for each of the
+        26 possible keys, decrypts the ciphertext and measures with the χ² statistic
+        <span class="math">Σ (Oᵢ − Eᵢ)² / Eᵢ</span> how far its letter counts Oᵢ are from the counts Eᵢ expected in English.
+        The key with the smallest χ² is the answer.
+      </p>
+      <dl id="corpus-facts" class="facts"></dl>
+
+      <h3>5.1 Attack on the ciphertext of section 3</h3>
+      <div class="chart-grid">
+        <div id="ch-english"></div>
+        <div id="ch-chi"></div>
+      </div>
+      <dl id="attack-out" class="facts"></dl>
+
+      <h3>5.2 Effectiveness and ciphertext length</h3>
+      <p class="note">
+        Random passages of the test part are encrypted with a random key and attacked. Besides letter frequencies,
+        two alternatives are compared. Exhaustive search tries all 26 keys and keeps the decryption with the most words
+        found in the corpus vocabulary. Bigram scoring sums <span class="math">log P(next letter | letter)</span>, estimated on the corpus,
+        and keeps the most probable decryption.
+      </p>
+      <div class="stats-controls">
+        <button id="exp-run" type="button">Run again</button>
+      </div>
+      <p id="exp-status" class="status" aria-live="polite"></p>
+      <div id="ch-exp"></div>
+      <div id="exp-table" class="table-wrap"></div>
+      <p id="exp-text" class="finding"></p>
+
+      <h3>5.3 Limitations</h3>
+      <ul class="why-list">
+        <li><strong>Length.</strong> Below about 20 letters the sample is too small: the measured distribution is dominated by chance and the wrong key often wins.</li>
+        <li><strong>Known language.</strong> The reference distribution must match the language of the message. An Italian text scored against English frequencies, or a list of names, codes or abbreviations, can mislead the attack.</li>
+        <li><strong>Unusual texts.</strong> A message written to avoid common letters, or made mostly of numbers, has a distribution far from the language and defeats the frequency test, while the dictionary and bigram scores degrade more slowly.</li>
+        <li><strong>Only for monoalphabetic ciphers.</strong> The attack works because one key maps every letter in the same way. It does not apply as is to ciphers that change the substitution along the text.</li>
+      </ul>
+      <p>
+        Since there are only 26 keys, exhaustive search alone already breaks the Caesar cipher: the hard part is not
+        trying the keys but recognising the right plaintext automatically. Letter frequencies need nothing but a
+        26-number profile and are independent of word boundaries; bigrams and dictionary words use more of the
+        structure of the language, so they need shorter texts but a larger model.
+      </p>
+    </section>
   </main>
 
   <script src="js/hw1/charts.js"></script>
@@ -113,6 +161,8 @@
   <script src="js/hw3/elgamal.js"></script>
   <script src="js/hw3/caesar.js"></script>
   <script src="js/hw3/schemes.js"></script>
+  <script src="js/hw3/corpus.js"></script>
+  <script src="js/hw3/cryptanalysis.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>

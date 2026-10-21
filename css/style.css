@@ -247,6 +247,7 @@ button:disabled, select:disabled { opacity: 0.45; cursor: not-allowed; }
 .chart .bar:hover { opacity: 0.75; }
 .chart .s1, .sw.s1 { fill: var(--accent); background: var(--accent); }
 .chart .s2, .sw.s2 { fill: var(--accent-2); background: var(--accent-2); }
+.chart .s3, .sw.s3 { fill: var(--c-gen); background: var(--c-gen); }
 .chart .reference { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 4 3; opacity: 0.7; }
 .chart .reference-label { fill: var(--ink-2); font: 11px var(--font-body); }
 .chart-legend {
@@ -272,7 +273,7 @@ button:disabled, select:disabled { opacity: 0.45; cursor: not-allowed; }
 .table-wrap + .finding, .chart-grid + .table-wrap, div[id^="ch-"] + .table-wrap { margin-top: 12px; }
 table.props td { white-space: normal; vertical-align: top; min-width: 140px; }
 #discussion p { max-width: 75ch; }
-#stats th, #discussion th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+#stats th, #discussion th, #cryptanalysis th, #compare th, #attack th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
 
 .mono { font-family: var(--font-mono); font-size: 0.88rem; overflow-wrap: anywhere; word-break: break-all; }
 
