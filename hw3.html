@@ -154,6 +154,69 @@
         structure of the language, so they need shorter texts but a larger model.
       </p>
     </section>
+
+    <section id="attack">
+      <h2><span class="sec-num">6</span> Attack on the restricted key space</h2>
+      <p class="note">
+        The attacker sees what is public: the curve, G, the public key Q, the ciphertext pairs (C₁, C₂) of section 2,
+        and the fact that <span class="math">d &lt; 2^b</span>. It does not use the letters of the ciphertext at all.
+        Exhaustive search computes G, 2G, 3G, … with one point addition per step until it reaches Q; the number of
+        steps is d itself. Once d is known, the message is decrypted exactly as the receiver would.
+      </p>
+      <p class="note">
+        Baby-step giant-step is an alternative. Write <span class="math">d = i·m + j</span> with
+        <span class="math">m = ⌈√2^b⌉</span>. First store the points jG for j = 1 … m (baby steps), then compute
+        <span class="math">Q − i·mG</span> for i = 0, 1, … (giant steps) until one of them is in the table. It needs
+        about <span class="math">2√2^b</span> operations instead of <span class="math">2^b</span>, at the cost of storing m points.
+      </p>
+      <div class="stats-controls">
+        <button id="atk-brute" type="button">Exhaustive search</button>
+        <button id="atk-bsgs" type="button" class="secondary">Baby-step giant-step</button>
+      </div>
+      <p id="atk-status" class="status" aria-live="polite"></p>
+      <dl id="atk-out" class="facts"></dl>
+
+      <h3>Cost for larger keys</h3>
+      <div id="atk-extra" class="table-wrap"></div>
+      <p id="atk-extra-text" class="finding">Run the exhaustive search to measure the speed of this browser and fill in the table.</p>
+    </section>
+
+    <section id="discussion">
+      <h2><span class="sec-num">7</span> Discussion</h2>
+
+      <h3>Key-space attack versus statistical attack</h3>
+      <ul class="why-list">
+        <li><strong>What is exploited.</strong> The Caesar attack exploits the ciphertext: it still carries the letter distribution of the language. The ECC attack ignores the ciphertext, whose coordinates look uniform (section 4), and exploits only that d is small.</li>
+        <li><strong>What is searched.</strong> Caesar has 26 keys, so trying them is trivial and the work is recognising the right plaintext with a statistical score. In the toy scheme recognising the right key is exact (dG = Q), and the work is the number of keys to try.</li>
+        <li><strong>Certainty.</strong> The statistical attack can fail on short or unusual texts and its success is a probability that grows with length (section 5.2). The key-space attack always succeeds within 2^b steps and does not depend on the message.</li>
+        <li><strong>What it recovers.</strong> Breaking one Caesar ciphertext reveals the shared key. Recovering d reveals the private key itself, so every past and future message sent to Q can be read.</li>
+      </ul>
+
+      <h3>Why this does not work against properly configured ECC</h3>
+      <p>
+        With d chosen uniformly in 1 … n − 1 and n ≈ 2²⁵⁶, exhaustive search needs up to 2²⁵⁶ point additions. The best known
+        generic algorithms for the discrete logarithm on secp256k1, baby-step giant-step and Pollard's rho, still need about
+        √n ≈ 2¹²⁸ operations, and no substantially faster method is known for this curve. The table in section 6 shows that this is far beyond
+        any computer. Statistics do not help either: the ciphertext points are masked by rQ with a fresh random r and look
+        uniform, so there is no distribution to exploit. The security of the scheme depends on the size of the key space,
+        which the toy version reduces on purpose.
+      </p>
+
+      <h3>Other attacks and other weaknesses</h3>
+      <p>Weaknesses that come from the restricted key space:</p>
+      <ul class="why-list">
+        <li>exhaustive search and baby-step giant-step, as above;</li>
+        <li>Pollard's kangaroo (lambda) method, designed for a key known to lie in an interval of width w, which needs about √w operations and almost no memory;</li>
+        <li>precomputation: since all users share G and the same small range, a table of all 2^b public keys built once breaks every user's key with a lookup.</li>
+      </ul>
+      <p>Weaknesses that come from the design of the toy scheme and would remain with a large key:</p>
+      <ul class="why-list">
+        <li><strong>Malleability.</strong> Anyone can change <span class="math">C₂</span> into <span class="math">C₂ + P</span>, which decrypts to <span class="math">M + P</span>: there is no integrity check or authentication.</li>
+        <li><strong>Reuse of r.</strong> If the same r is used for two blocks, <span class="math">C₂ − C₂′ = M − M′</span>, and a known block reveals the other one. r must be random and fresh for every block.</li>
+        <li><strong>Block-by-block encryption.</strong> Each 30-byte block is encrypted independently, so the number of blocks leaks the length of the message, and blocks can be reordered or removed without detection.</li>
+        <li><strong>No validation of received points.</strong> A receiver that does not check that C₁ is on the curve can be tricked into computing d·C₁ on a weaker curve (invalid-curve attack).</li>
+      </ul>
+    </section>
   </main>
 
   <script src="js/hw1/charts.js"></script>
@@ -163,6 +226,7 @@
   <script src="js/hw3/schemes.js"></script>
   <script src="js/hw3/corpus.js"></script>
   <script src="js/hw3/cryptanalysis.js"></script>
+  <script src="js/hw3/attack.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
