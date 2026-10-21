@@ -6,10 +6,16 @@ const METHODS = [
   { key: "bigram", name: "bigram scoring", cls: "s2" }
 ];
 
-const split = Math.floor(CORPUS.length * 0.8);
-const TRAIN = CORPUS.slice(0, split);
-const TEST = CORPUS.slice(split);
-const model = buildModel(TRAIN);
+const MIN_CORPUS_LETTERS = 2000;
+let corpusTitle = CORPUS_TITLE;
+let TEST = "";
+let model = null;
+
+function useCorpus(text) {
+  const split = Math.floor(text.length * 0.8);
+  TEST = text.slice(split);
+  model = buildModel(text.slice(0, split));
+}
 
 function letterIndex(c) {
   const code = c.charCodeAt(0);
@@ -173,7 +179,7 @@ function renderTable(id, header, rows) {
 function renderCorpus() {
   const list = document.getElementById("corpus-facts");
   list.replaceChildren();
-  fact(list, "Corpus", CORPUS_TITLE);
+  fact(list, "Corpus", corpusTitle + ", " + document.getElementById("in-corpus").value.length.toLocaleString("en-US") + " characters");
   fact(list, "Training part", "first 80%, " + model.letters.toLocaleString("en-US") + " letters, " + model.words.size.toLocaleString("en-US") + " distinct words");
   fact(list, "Test part", "last 20%, never used to build the model");
   barChart(document.getElementById("ch-english"), {
@@ -182,8 +188,24 @@ function renderCorpus() {
   });
 }
 
-renderCorpus();
-attackSection3();
-runExperiment();
+function updateCorpus() {
+  const text = document.getElementById("in-corpus").value;
+  const errorBox = document.getElementById("corpus-error");
+  if (letterCounts(text).reduce((s, v) => s + v, 0) < MIN_CORPUS_LETTERS) {
+    errorBox.textContent = "The corpus needs at least " + MIN_CORPUS_LETTERS.toLocaleString("en-US") + " letters.";
+    errorBox.hidden = false;
+    return;
+  }
+  errorBox.hidden = true;
+  corpusTitle = text === CORPUS ? CORPUS_TITLE : "Edited text";
+  useCorpus(text);
+  renderCorpus();
+  attackSection3();
+  runExperiment();
+}
+
+document.getElementById("in-corpus").value = CORPUS;
+document.getElementById("corpus-update").addEventListener("click", updateCorpus);
+updateCorpus();
 document.addEventListener("hw3:encrypted", attackSection3);
 document.getElementById("exp-run").addEventListener("click", runExperiment);

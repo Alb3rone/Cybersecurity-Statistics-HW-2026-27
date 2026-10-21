@@ -116,6 +116,11 @@
         <span class="math">Σ (Oᵢ − Eᵢ)² / Eᵢ</span> how far its letter counts Oᵢ are from the counts Eᵢ expected in English.
         The key with the smallest χ² is the answer.
       </p>
+      <label for="in-corpus" class="msg-label">Corpus in English (editable)
+        <textarea id="in-corpus" rows="8" spellcheck="false"></textarea>
+      </label>
+      <button id="corpus-update" type="button">Use this corpus</button>
+      <p id="corpus-error" class="error" role="alert" hidden></p>
       <dl id="corpus-facts" class="facts"></dl>
 
       <h3>5.1 Attack on the ciphertext of section 3</h3>
