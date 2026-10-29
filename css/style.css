@@ -273,7 +273,7 @@ button:disabled, select:disabled { opacity: 0.45; cursor: not-allowed; }
 .table-wrap + .finding, .chart-grid + .table-wrap, div[id^="ch-"] + .table-wrap { margin-top: 12px; }
 table.props td { white-space: normal; vertical-align: top; min-width: 140px; }
 #discussion p { max-width: 75ch; }
-#stats th, #discussion th, #cryptanalysis th, #compare th, #attack th, #model th, #trajectories th, #distributions th, #lln th, #clt th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+#stats th, #discussion th, #cryptanalysis th, #compare th, #attack th, #model th, #trajectories th, #distributions th, #lln th, #clt th, #interpretation th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
 
 .mono { font-family: var(--font-mono); font-size: 0.88rem; overflow-wrap: anywhere; word-break: break-all; }
 

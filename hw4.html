@@ -67,12 +67,55 @@
       <div id="spread" class="table-wrap"></div>
       <p id="traj-text" class="finding"></p>
     </section>
+
+    <section id="distributions">
+      <h2><span class="sec-num">3</span> Distributions as n grows</h2>
+      <p class="note">
+        To study the distributions, many attackers are needed: each one gives a single value of Sₙ, so the histograms
+        below use a much larger number of attackers than the trajectories. The model and p are those of section 1.
+      </p>
+      <div class="stats-controls">
+        <label for="in-mdist">Attackers m for sections 3–5
+          <input id="in-mdist" type="number" min="100" max="10000" step="100" value="2000">
+        </label>
+        <button id="dist-run" type="button">Simulate again</button>
+      </div>
+      <p id="dist-error" class="error" role="alert" hidden></p>
+      <p id="dist-status" class="status" aria-live="polite"></p>
+      <div id="dist-grid" class="chart-grid"></div>
+      <h3>Mean and variance under the three normalizations</h3>
+      <div id="dist-table" class="table-wrap"></div>
+      <p id="dist-text" class="finding"></p>
+    </section>
+
+    <section id="lln">
+      <h2><span class="sec-num">4</span> Law of Large Numbers: convergence in probability of Sₙ / n</h2>
+      <p class="note">
+        Sₙ/n converges in probability to μ if, for every ε &gt; 0, <span class="math">P(|Sₙ/n − μ| &gt; ε) → 0</span> as
+        n → ∞. The probability is estimated as the share of attackers whose average score is more than ε away from μ.
+      </p>
+      <div id="lln-grid" class="chart-grid"></div>
+      <div id="lln-table" class="table-wrap"></div>
+      <p id="lln-text" class="finding"></p>
+    </section>
+
+    <section id="clt">
+      <h2><span class="sec-num">5</span> Central Limit Theorem: Sₙ / √n in the Rademacher case</h2>
+      <p class="note">
+        The bars are the share of attackers in each class; the dashed marks are the probability that a standard normal
+        variable falls in the same class. This section always uses the Rademacher model, whatever is chosen in section 1.
+      </p>
+      <div id="clt-grid" class="chart-grid"></div>
+      <div id="clt-table" class="table-wrap"></div>
+      <p id="clt-text" class="finding"></p>
+    </section>
   </main>
 
   <script src="js/hw1/charts.js"></script>
   <script src="js/hw4/model.js"></script>
   <script src="js/hw4/plot.js"></script>
   <script src="js/hw4/trajectories.js"></script>
+  <script src="js/hw4/distributions.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
