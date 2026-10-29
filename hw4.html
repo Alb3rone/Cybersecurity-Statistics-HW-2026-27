@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 4 – Penetration score, Law of Large Numbers and Central Limit Theorem</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 4 · n systems and m attackers</p>
+    <h1>Penetration score: LLN and CLT</h1>
+    <p class="lead">
+      Each of m attackers tries to penetrate n systems, one after the other. The score obtained on each system is a
+      random increment, and the sum of the increments is the attacker's penetration score. Simulating many attackers
+      shows how the total, the average and the normalized total behave as the number of systems grows.
+    </p>
+  </header>
+
+  <main>
+    <section id="model">
+      <h2><span class="sec-num">1</span> The model</h2>
+      <p class="note">
+        Attacker j meets the systems in order and gets a score <span class="math">Xᵢ</span> on system i. The increments
+        <span class="math">X₁, X₂, …</span> are independent and identically distributed, with mean μ and variance σ².
+        After k systems the attacker's score is <span class="math">Sₖ = X₁ + … + Xₖ</span>, so every attacker draws one
+        trajectory <span class="math">S₁, S₂, …, Sₙ</span> and the m attackers give m independent trajectories.
+      </p>
+      <ul class="why-list">
+        <li><strong>Bernoulli model.</strong> <span class="math">Xᵢ ∈ {0, 1}</span>, with <span class="math">P(Xᵢ = 1) = p</span>: system i is either penetrated (1) or not (0), and Sₙ counts the penetrated systems. μ = p, σ² = p(1 − p).</li>
+        <li><strong>Rademacher model.</strong> <span class="math">Xᵢ ∈ {−1, +1}</span> with probability ½ each: every system either adds or removes one point, the symmetric zero-mean case. μ = 0, σ² = 1.</li>
+      </ul>
+      <form id="sim-form" class="param-form" novalidate>
+        <label for="in-model"><span class="lbl">model</span> <span class="hint">distribution of Xᵢ</span>
+          <select id="in-model">
+            <option value="bernoulli">Bernoulli</option>
+            <option value="rademacher">Rademacher</option>
+          </select>
+        </label>
+        <label for="in-p"><span class="lbl">p</span> <span class="hint">P(Xᵢ = 1), Bernoulli</span>
+          <input id="in-p" type="number" min="0.01" max="0.99" step="0.01" value="0.3">
+        </label>
+        <label for="in-n"><span class="lbl">n</span> <span class="hint">systems (10–100000)</span>
+          <input id="in-n" type="number" min="10" max="100000" step="1" value="1000">
+        </label>
+        <label for="in-m"><span class="lbl">m</span> <span class="hint">attackers (1–200)</span>
+          <input id="in-m" type="number" min="1" max="200" step="1" value="30">
+        </label>
+        <button id="btn-sim" type="submit">Simulate</button>
+      </form>
+      <p id="sim-error" class="error" role="alert" hidden></p>
+
+      <h3>Mean and variance of the three quantities</h3>
+      <p class="note">Since the increments are independent, means and variances add: <span class="math">E[Sₙ] = nμ</span> and <span class="math">Var(Sₙ) = nσ²</span>. Dividing by a constant c divides the variance by c².</p>
+      <div id="theory" class="table-wrap"></div>
+    </section>
+
+    <section id="trajectories">
+      <h2><span class="sec-num">2</span> Sample trajectories</h2>
+      <p class="note">
+        Each thin line is one attacker, followed from the first to the n-th system. The dashed lines mark the expected
+        value plus and minus two standard deviations, the band where about 95% of the attackers should be.
+      </p>
+      <div id="ch-total"></div>
+      <div id="ch-average"></div>
+      <div id="ch-normalized"></div>
+      <div id="spread" class="table-wrap"></div>
+      <p id="traj-text" class="finding"></p>
+    </section>
+  </main>
+
+  <script src="js/hw1/charts.js"></script>
+  <script src="js/hw4/model.js"></script>
+  <script src="js/hw4/plot.js"></script>
+  <script src="js/hw4/trajectories.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
