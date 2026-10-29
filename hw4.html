@@ -109,6 +109,39 @@
       <div id="clt-table" class="table-wrap"></div>
       <p id="clt-text" class="finding"></p>
     </section>
+
+    <section id="interpretation">
+      <h2><span class="sec-num">6</span> What it means for n systems and m attackers</h2>
+
+      <h3>System size n</h3>
+      <div id="int-size" class="table-wrap"></div>
+      <ul class="why-list">
+        <li><strong>The total score grows, and so does its uncertainty.</strong> An attacker facing more systems collects more points on average, nμ, but the spread between attackers also grows, like σ√n. In absolute terms two attackers become more and more different as the infrastructure grows.</li>
+        <li><strong>The average score becomes predictable.</strong> The uncertainty grows more slowly than the total: relative to n it shrinks like 1/√n. This is the Law of Large Numbers: in a large infrastructure every attacker penetrates almost exactly a share p of the systems, and the individual luck of an attacker stops mattering. For a defender, p is the quantity that decides the expected damage, and n only scales it.</li>
+        <li><strong>Fluctuations have a universal shape.</strong> The deviation of the total from nμ, measured in units of σ√n, follows a standard normal distribution for large n (section 5). So for any n, about 2.3% of the attackers exceed nμ + 2σ√n, whatever the details of the single-system score.</li>
+        <li><strong>The symmetric case.</strong> In the Rademacher model there is no drift: no attacker is favoured, the total wanders around 0 and after n systems it is typically within ±2√n. A large total is not evidence of a skilled attacker, but the expected size of a random walk.</li>
+      </ul>
+
+      <h3>Number of attackers m</h3>
+      <div id="int-attackers" class="table-wrap"></div>
+      <ul class="why-list">
+        <li><strong>Each attacker is one independent sample.</strong> m does not change the distribution of a single attacker's score: it changes how much of that distribution we observe. With few attackers the histograms of section 3 are rough; with m in the thousands they match the theoretical shape, and the estimate of the mean improves like 1/√m.</li>
+        <li><strong>More attackers, more extreme outcomes.</strong> A score above nμ + 2σ√n is rare for one attacker (2.3%) but almost certain to appear among 100 attackers. The defender has to plan for the best of the m attackers, not for the typical one, and that grows with m.</li>
+        <li><strong>The aggregate over all attackers.</strong> Summing the scores of all m attackers gives m·n independent increments: the aggregate has mean mnμ and standard deviation σ√(mn), so the aggregate penetration rate is known with precision σ/√(mn). Doubling either the systems or the attackers has the same effect on it.</li>
+      </ul>
+      <p>
+        In short, n controls the behaviour of a single trajectory: the total diverges, the average converges to μ and the
+        normalized total keeps a stable normal shape. m controls how many trajectories are observed: it makes the
+        estimates reliable and the extreme attackers more likely.
+      </p>
+
+      <h3>Limits of the model</h3>
+      <ul class="why-list">
+        <li><strong>Independence between systems.</strong> Real systems often share software and configurations, so one vulnerability can open many of them at once. Positively correlated increments make the variance of Sₙ larger than nσ², and if a common cause affects all systems the average Sₙ/n no longer concentrates around μ.</li>
+        <li><strong>Same probability on every system.</strong> Systems differ in how well they are protected, so p is not the same everywhere. With independent systems the average still converges, but to the mean of the different pᵢ, and the variance is smaller than np(1−p).</li>
+        <li><strong>Non-adaptive attackers.</strong> The model assumes the attacker does not learn: a real attacker who penetrates a system gains information that raises the chance on the next ones, so the increments are neither independent nor identically distributed.</li>
+      </ul>
+    </section>
   </main>
 
   <script src="js/hw1/charts.js"></script>
@@ -116,6 +149,7 @@
   <script src="js/hw4/plot.js"></script>
   <script src="js/hw4/trajectories.js"></script>
   <script src="js/hw4/distributions.js"></script>
+  <script src="js/hw4/interpretation.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
