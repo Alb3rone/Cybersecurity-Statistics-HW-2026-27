@@ -100,10 +100,33 @@
       <div id="sample-table" class="table-wrap"></div>
       <p id="sample-text" class="finding"></p>
     </section>
+
+    <section id="repeat">
+      <h2><span class="sec-num">3</span> Different numbers of systems n</h2>
+      <p class="note">
+        The experiment is repeated with the same m hackers of section 2 for n = 2, 5, 10, 30, 100 and 1000 systems.
+        For each n the table compares the spread of x̄ and s² across hackers with the theory:
+        <span class="math">sd(x̄) = σ/√n</span> and <span class="math">sd(s²) = σ²·√(κ/n − (n − 3)/(n(n − 1)))</span>,
+        where <span class="math">κ = E[(X − μ)⁴]/σ⁴ = 2.88</span> for this distribution.
+      </p>
+      <div id="repeat-table" class="table-wrap"></div>
+      <div id="repeat-grid" class="chart-grid"></div>
+      <p id="repeat-text" class="finding"></p>
+
+      <h3>Conclusions</h3>
+      <ul class="why-list">
+        <li><strong>The averages match the theory.</strong> For every n, the average of the sampling means is close to μ and the average of the sampling variances is close to σ². The sampling mean and the sampling variance with divisor n − 1 are unbiased estimators: <span class="math">E[x̄] = μ</span> and <span class="math">E[s²] = σ²</span>. With divisor n the average would be <span class="math">(n − 1)/n·σ²</span>, too small, clearly visible for n = 2 where it would be half of σ².</li>
+        <li><strong>Why it is useful in inferential statistics.</strong> In practice μ and σ² are unknown and only one sample is observed, here the n scores of one hacker. Unbiasedness guarantees that x̄ and s² computed from the sample are correct on average, with no systematic error. s² also estimates the uncertainty of x̄, through the standard error <span class="math">s/√n</span>, which is what confidence intervals and tests are built on.</li>
+        <li><strong>Effect of n.</strong> The number of systems does not move the centre of the estimators, but it reduces their variability: the standard deviations of x̄ and s² across hackers decrease like 1/√n, so the histograms narrow around μ and σ². With few systems a single hacker's estimate can be far from the true value, especially for the variance, whose distribution is skewed for small n; with many systems every hacker's estimates are close to μ and σ².</li>
+        <li><strong>Effect of m.</strong> The number of hackers does not change the variability of a single hacker's estimates: it only makes their averages, and the histograms, more precise, with an error that decreases like 1/√m.</li>
+      </ul>
+    </section>
   </main>
 
+  <script src="js/hw1/charts.js"></script>
   <script src="js/hw5/welford.js"></script>
   <script src="js/hw5/sampling.js"></script>
+  <script src="js/hw5/repeat.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
