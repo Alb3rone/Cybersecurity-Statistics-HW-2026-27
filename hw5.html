@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 5 – Welford's recurrences, sampling mean and sampling variance</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 5 · m hackers and n systems</p>
+    <h1>Welford's recurrences and sampling statistics</h1>
+    <p class="lead">
+      The mean, the sum of squares and the variance of a sequence of scores can be updated one value at a time.
+      These recurrences are used to compute, for every hacker, the sampling mean and the sampling variance of the
+      scores obtained on n systems, and to compare them with the mean and variance of the score distribution.
+    </p>
+  </header>
+
+  <main>
+    <section id="welford">
+      <h2><span class="sec-num">1</span> Welford's recurrence formulas</h2>
+      <p class="note">
+        For the first k values <span class="math">x₁, …, xₖ</span> let
+        <span class="math">Mₖ = (1/k)·Σᵢ₌₁ᵏ xᵢ</span> be the mean,
+        <span class="math">SSₖ = Σᵢ₌₁ᵏ (xᵢ − Mₖ)²</span> the sum of squares and
+        <span class="math">sₖ² = SSₖ/(k − 1)</span> the sampling variance, with <span class="math">M₀ = SS₀ = 0</span>.
+      </p>
+
+      <h3>Knuth's recurrence for the mean</h3>
+      <p class="note">The sum of the first k values is the sum of the first k − 1 plus the new one:</p>
+      <ol class="algo derivation">
+        <li><span class="math">k·Mₖ = Σᵢ₌₁ᵏ⁻¹ xᵢ + xₖ = (k − 1)·Mₖ₋₁ + xₖ</span></li>
+        <li><span class="math">k·Mₖ = k·Mₖ₋₁ + (xₖ − Mₖ₋₁)</span></li>
+        <li><span class="math"><strong>Mₖ = Mₖ₋₁ + (xₖ − Mₖ₋₁)/k</strong></span></li>
+      </ol>
+
+      <h3>Welford's recurrence for the sum of squares</h3>
+      <p class="note">
+        The same idea is applied to <span class="math">SSₖ = Σᵢ₌₁ᵏ xᵢ² − k·Mₖ²</span>: the sum of the squares grows only by
+        <span class="math">xₖ²</span>, so
+      </p>
+      <ol class="algo derivation">
+        <li><span class="math">SSₖ − SSₖ₋₁ = xₖ² − k·Mₖ² + (k − 1)·Mₖ₋₁²</span></li>
+        <li>from the mean recurrence <span class="math">(k − 1)·Mₖ₋₁ = k·Mₖ − xₖ</span>, hence <span class="math">(k − 1)·Mₖ₋₁² = k·Mₖ·Mₖ₋₁ − xₖ·Mₖ₋₁</span></li>
+        <li><span class="math">SSₖ − SSₖ₋₁ = xₖ·(xₖ − Mₖ₋₁) − k·Mₖ·(Mₖ − Mₖ₋₁)</span></li>
+        <li>from the mean recurrence <span class="math">k·(Mₖ − Mₖ₋₁) = xₖ − Mₖ₋₁</span>, hence <span class="math">SSₖ − SSₖ₋₁ = (xₖ − Mₖ₋₁)·(xₖ − Mₖ)</span></li>
+        <li><span class="math"><strong>SSₖ = SSₖ₋₁ + (xₖ − Mₖ₋₁)·(xₖ − Mₖ)</strong></span></li>
+      </ol>
+
+      <h3>Recurrence for the variance</h3>
+      <p class="note">Dividing by the degrees of freedom, <span class="math">(k − 1)·sₖ² = (k − 2)·sₖ₋₁² + (xₖ − Mₖ₋₁)·(xₖ − Mₖ)</span>, which has the same form as the mean recurrence, for k ≥ 2 (with s₁² = 0, since SS₁ = 0):</p>
+      <ol class="algo derivation">
+        <li><span class="math"><strong>sₖ² = sₖ₋₁² + [(xₖ − Mₖ₋₁)·(xₖ − Mₖ) − sₖ₋₁²]/(k − 1)</strong></span></li>
+      </ol>
+      <p class="note">
+        Each new value needs only the current k, Mₖ₋₁ and SSₖ₋₁: one pass over the data and constant memory. Unlike
+        <span class="math">Σxᵢ² − k·Mₖ²</span>, the update never subtracts two large and almost equal numbers, so it does not lose precision.
+      </p>
+
+      <h3>Code</h3>
+      <p class="note">The function used on this page; the core logic is the three lines inside the loop.</p>
+      <pre class="code-block"><code id="welford-code"></code></pre>
+
+      <form id="welford-form" class="param-form" novalidate>
+        <label for="in-data" class="wide-field"><span class="lbl">data</span> <span class="hint">numbers separated by spaces or commas</span>
+          <input id="in-data" type="text" value="6.5 3 8 4.5 7 2 9 5.5 1 6">
+        </label>
+        <button type="submit">Compute</button>
+      </form>
+      <p id="welford-error" class="error" role="alert" hidden></p>
+      <div id="welford-steps" class="table-wrap"></div>
+      <p id="welford-check" class="finding"></p>
+    </section>
+
+  </main>
+
+  <script src="js/hw5/welford.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>

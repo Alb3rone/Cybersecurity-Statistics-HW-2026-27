@@ -399,3 +399,17 @@ textarea:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px
 .sw.path { background: var(--accent); }
 .sw.guide { background: var(--accent-2); }
 .sw.mean { background: var(--ink); }
+.code-block {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.derivation { margin-bottom: 16px; }
+.derivation li { overflow-wrap: anywhere; }
+#welford-form, #sample-form { margin-bottom: 16px; }
+#welford th, #sampling th, #repeat th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
