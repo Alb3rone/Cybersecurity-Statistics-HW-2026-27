@@ -73,9 +73,37 @@
       <p id="welford-check" class="finding"></p>
     </section>
 
+    <section id="sampling">
+      <h2><span class="sec-num">2</span> Sampling mean and sampling variance</h2>
+      <p class="note">
+        Each penetration attempt receives a score between 0 and 10. The score is <span class="math">X = 10·B</span> with
+        <span class="math">B ~ Beta(α = 2, β = 5)</span>, whose density is <span class="math">f(x) = 3·(x/10)·(1 − x/10)⁴</span> on [0, 10]:
+        most attempts get a low score and high scores are rare, as when only a few systems are seriously compromised.
+        A value of B is drawn as the second smallest of six independent uniform numbers on [0, 1].
+      </p>
+      <div id="score-theory" class="table-wrap"></div>
+      <p class="note">
+        Each of the m hackers attacks n systems and gets n independent scores. Welford's recurrences (section 1) give the
+        hacker's sampling mean <span class="math">x̄</span> and sampling variance <span class="math">s² = SSₙ/(n − 1)</span>;
+        then x̄ and s² are averaged over the m hackers.
+      </p>
+      <form id="sample-form" class="param-form" novalidate>
+        <label for="in-hackers"><span class="lbl">m</span> <span class="hint">hackers (10–10000)</span>
+          <input id="in-hackers" type="number" min="10" max="10000" step="1" value="2000">
+        </label>
+        <label for="in-systems"><span class="lbl">n</span> <span class="hint">systems per hacker (2–10000)</span>
+          <input id="in-systems" type="number" min="2" max="10000" step="1" value="50">
+        </label>
+        <button type="submit">Simulate</button>
+      </form>
+      <p id="sample-error" class="error" role="alert" hidden></p>
+      <div id="sample-table" class="table-wrap"></div>
+      <p id="sample-text" class="finding"></p>
+    </section>
   </main>
 
   <script src="js/hw5/welford.js"></script>
+  <script src="js/hw5/sampling.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
