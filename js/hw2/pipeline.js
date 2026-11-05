@@ -100,7 +100,7 @@ async function runPipeline() {
     });
     addStep(list, {
       title: "Public key", standard: "secp256k1", chips: ["pkc"],
-      text: "Q = kG, the same scalar multiplication as HMWK 1 on a 256-bit curve. Ethereum uses the 64 bytes x ‖ y.",
+      text: "Q = kG, the same scalar multiplication as HMWK 1.1 on a 256-bit curve. Ethereum uses the 64 bytes x ‖ y.",
       values: [
         { label: "x", value: bytesToHex(pub.slice(0, 32)), className: "mono" },
         { label: "y", value: bytesToHex(pub.slice(32)), className: "mono" }

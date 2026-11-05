@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HMWK 2 – Twelve words to an Ethereum address</title>
+  <title>HMWK 1.2 – Twelve words to an Ethereum address</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="page-head">
-    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 2 · wallet seed to Ethereum address</p>
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 1.2 · wallet seed to Ethereum address</p>
     <h1>Twelve words to an Ethereum address</h1>
     <p class="lead">
       A wallet such as MetaMask turns twelve words into an Ethereum address through six standards, each built on a
@@ -120,7 +120,7 @@
       <ul class="why-list">
         <li><strong>BIP-39 / BIP-32 / BIP-44 → key management.</strong> A person must back up one secret and restore every key from it. This needs a human-friendly encoding, a slow key-stretching function (PBKDF2 makes each guess of a phrase 2048 times more expensive) and a deterministic tree of keys. A hash alone gives none of this.</li>
         <li><strong>secp256k1 → ownership and signatures.</strong> Only an algebraic structure gives a public key that can verify signatures made with the private key. A hash has no such structure: knowing H(k) does not let anyone check a signature.</li>
-        <li><strong>Keccak-256 → a short, uniform identifier.</strong> The public key is 64 bytes and has the structure seen in HMWK 1. Hashing removes that structure and shortens it to 20 bytes, while finding another key with the same address is infeasible.</li>
+        <li><strong>Keccak-256 → a short, uniform identifier.</strong> The public key is 64 bytes and has the structure seen in HMWK 1.1. Hashing removes that structure and shortens it to 20 bytes, while finding another key with the same address is infeasible.</li>
         <li><strong>EIP-55 → error detection.</strong> A typo in an address sends money to the wrong place forever. A checksum catches it, and EIP-55 does this without breaking existing lowercase addresses.</li>
       </ul>
       <p>

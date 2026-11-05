@@ -166,7 +166,7 @@ function addressUniformity(addresses) {
   say("st-uniform-text",
     "Across " + total + " hex digits every digit appears close to 1/16 = 6.25% of the time (χ² = " + f(chi.chi) + " with 15 degrees of freedom, p = " + pText(chi.pValue) + "). " +
     "The 160 address bits are 1 in " + pct(meanShare) + " of the cases on average, from " + pct(Math.min(...shares), 0) + " to " + pct(Math.max(...shares), 0) + " for single positions: with only 100 addresses one standard deviation is 5%, so this spread is ordinary noise. " +
-    "Unlike the public keys of HMWK 1, which showed symmetries and fixed counts, the hashed addresses show no structure: Keccak-256 has removed it.");
+    "Unlike the public keys of HMWK 1.1, which showed symmetries and fixed counts, the hashed addresses show no structure: Keccak-256 has removed it.");
   return chi;
 }
 
