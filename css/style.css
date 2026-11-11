@@ -412,4 +412,4 @@ textarea:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px
 .derivation { margin-bottom: 16px; }
 .derivation li { overflow-wrap: anywhere; }
 #welford-form, #sample-form { margin-bottom: 16px; }
-#welford th, #sampling th, #repeat th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+#welford th, #sampling th, #repeat th, #integrals th, #convergence th, #pathological th, #normal th, #methods th, #efficiency th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }

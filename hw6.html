@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 5 – Riemann and Lebesgue integration, numerical computation of the normal CDF</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 5 · numerical integration</p>
+    <h1>Riemann, Lebesgue and the normal CDF</h1>
+    <p class="lead">
+      Exercise 1 approximates integrals in two ways, by partitioning the domain as in Riemann's definition and by
+      partitioning the range as in Lebesgue's, and compares them. Exercise 2 computes the cumulative distribution
+      function of the standard normal distribution, which has no elementary closed form.
+    </p>
+  </header>
+
+  <main>
+    <section id="integrals">
+      <h2><span class="sec-num">1</span> Riemann and Lebesgue sums</h2>
+      <ul class="why-list">
+        <li><strong>Riemann: partition the domain.</strong> [a, b] is cut into N subintervals of width h = (b − a)/N and f is evaluated at the midpoint of each: <span class="math">∫f ≈ h·Σᵢ f(a + (i + ½)h)</span>.</li>
+        <li><strong>Lebesgue: partition the range.</strong> The values of f, from y_min to y_max, are cut into K levels tⱼ, and for each level the measure of the preimage <span class="math">{x : f(x) &gt; tⱼ}</span> is taken: <span class="math">∫f = y_min·(b − a) + ∫ μ({f &gt; t}) dt ≈ y_min·(b − a) + Δt·Σⱼ μ({f &gt; tⱼ})</span>. A computer cannot measure a preimage exactly, so μ is estimated from M = N points of the domain: the values are sorted once and, for each level, a binary search counts how many exceed tⱼ.</li>
+      </ul>
+      <form id="int-form" class="param-form" novalidate>
+        <label for="in-n"><span class="lbl">N</span> <span class="hint">subintervals / domain points</span>
+          <input id="in-n" type="number" min="2" max="1000000" step="1" value="1000">
+        </label>
+        <label for="in-k"><span class="lbl">K</span> <span class="hint">levels of the range</span>
+          <input id="in-k" type="number" min="1" max="1000000" step="1" value="1000">
+        </label>
+        <button type="submit">Compute</button>
+      </form>
+      <p id="int-error" class="error" role="alert" hidden></p>
+      <div id="int-table" class="table-wrap"></div>
+      <p class="finding">
+        For all these Riemann-integrable functions the two approaches converge to the same value, the exact integral.
+        The two step functions are computed exactly by both, up to rounding, when N is even, because the jump at 0.5 falls on the border
+        between two subintervals; with N odd the subinterval containing 0.5 gives a Riemann error of order 1/N.
+        For 1/√x the integral is improper in Riemann's sense, and both sums converge only slowly.
+      </p>
+    </section>
+
+    <section id="convergence">
+      <h2><span class="sec-num">2</span> Accuracy, convergence and efficiency</h2>
+      <p class="note">Absolute error of the two approximations as N grows, with K = N levels for Lebesgue.</p>
+      <h3>Riemann (midpoint), absolute error</h3>
+      <div id="conv-riemann" class="table-wrap"></div>
+      <h3>Lebesgue (range partition), absolute error</h3>
+      <div id="conv-lebesgue" class="table-wrap"></div>
+      <h3>Computing time for sin(x)</h3>
+      <div id="conv-time" class="table-wrap"></div>
+      <ul class="why-list">
+        <li><strong>Accuracy and convergence.</strong> For smooth functions the midpoint Riemann error falls like 1/N²: a factor 100 for every factor 10 in N. The Lebesgue error falls more slowly and less regularly, because it has two sources: the K levels, and the estimate of each preimage measure from a finite number of points, which changes in steps of 1/M. For |x − 0.5| the midpoint rule is exact, because f is linear on each subinterval. For 1/√x both errors fall only like 1/√N, because of the singularity at 0.</li>
+        <li><strong>Where Lebesgue is natural.</strong> For a step function the measure of {f &gt; t} is the same for every level between the two values, so the range partition captures it with any K; the Riemann sum needs the jump to fall on a border.</li>
+        <li><strong>Efficiency.</strong> The Riemann sum costs N evaluations and N additions. The Lebesgue sum costs the same N evaluations plus sorting them, O(N log N), and K binary searches, O(K log N), so it is several times slower for the same N.</li>
+      </ul>
+    </section>
+
+    <section id="pathological">
+      <h2><span class="sec-num">3</span> Where the two approaches differ</h2>
+      <h3>Dirichlet function</h3>
+      <p class="note">
+        <span class="math">f(x) = 1</span> if x is rational, 0 otherwise. Every subinterval, however small, contains both rationals and
+        irrationals, so the upper Darboux sum is 1 and the lower is 0 for every partition: the Riemann sums depend on the
+        points chosen and f is not Riemann-integrable. Lebesgue's definition partitions the range {0, 1}: the preimage of 1
+        is <span class="math">ℚ ∩ [0, 1]</span>, which is countable, so it has measure 0, and the preimage of 0 has measure 1. Hence
+        <span class="math">∫f = 1·0 + 0·1 = 0</span>. That ℚ ∩ [0, 1] has measure 0 can be checked numerically: listing the rationals
+        and covering the k-th with an interval of length ε/2ᵏ, the total length of the cover never exceeds ε, however many rationals are covered.
+      </p>
+      <div id="cover-table" class="table-wrap"></div>
+      <p class="note">
+        A numerical sampling cannot do this directly: every floating-point number is a fraction with a power of 2 in the
+        denominator, so a program that evaluates f at sample points would find f = 1 everywhere.
+      </p>
+      <h3>Thomae's function</h3>
+      <p class="note">
+        <span class="math">f(p/q) = 1/q</span> in lowest terms, 0 at irrationals. The lower Darboux sum is 0, because every subinterval
+        contains irrationals. The supremum on a subinterval is 1/q, with q the smallest denominator of a rational inside it;
+        computing it exactly gives the upper sums below, which go to 0, so f is Riemann-integrable with integral 0.
+        For Lebesgue, f = 0 except on the countable set of rationals, which has measure 0, so the integral is again 0:
+        here the two approaches agree.
+      </p>
+      <div id="thomae-table" class="table-wrap"></div>
+    </section>
+
+  </main>
+
+  <script src="js/hw6/integrals.js"></script>
+  <script src="js/hw6/pathological.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
