@@ -141,11 +141,34 @@
       </p>
     </section>
 
+    <section id="efficiency">
+      <h2><span class="sec-num">6</span> Efficiency and accuracy</h2>
+      <h3>Simpson's rule: error as n doubles</h3>
+      <div id="simpson-table" class="table-wrap"></div>
+      <p class="note">Each doubling of n divides the error by about 16: Simpson's error falls like 1/n⁴, until rounding errors of order 10⁻¹⁶ take over.</p>
+      <h3>erf series: cancellation for large x</h3>
+      <div id="series-table" class="table-wrap"></div>
+      <p class="note">
+        The series converges for every x, but the terms alternate in sign and grow up to roughly e^(x²/2) before
+        decreasing. Their sum is at most 1, so the digits of the largest terms cancel and about log₁₀ of the largest
+        term digits are lost: at x = 8 the error is already of order 10⁻⁵. The series of this method has only positive
+        terms, so it has no cancellation, and the tail is handled by the continued fraction.
+      </p>
+      <h3>Time and accuracy of each method</h3>
+      <div id="time-table" class="table-wrap"></div>
+      <ul class="why-list">
+        <li><strong>A&amp;S 7.1.26</strong> is the fastest, one exponential and a fifth-degree polynomial, but its accuracy is limited to about 10⁻⁷: enough for tables and tests, not for small tail probabilities.</li>
+        <li><strong>Simpson</strong> needs about a hundred evaluations of φ for each value and its accuracy depends on n; it is the slowest.</li>
+        <li><strong>The erf series</strong> needs more terms as |x| grows and becomes inaccurate in the tails.</li>
+        <li><strong>This method</strong> reaches full double precision for every x, including the tails, at a cost of a few dozen operations per evaluation.</li>
+      </ul>
+    </section>
   </main>
 
   <script src="js/hw6/integrals.js"></script>
   <script src="js/hw6/pathological.js"></script>
   <script src="js/hw6/normal.js"></script>
+  <script src="js/hw6/efficiency.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
