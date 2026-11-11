@@ -86,10 +86,66 @@
       <div id="thomae-table" class="table-wrap"></div>
     </section>
 
+    <section id="normal">
+      <h2><span class="sec-num">4</span> The normal CDF has no elementary form</h2>
+      <p class="note">
+        The standard normal CDF is <span class="math">Φ(x) = ∫₋∞ˣ φ(t) dt</span> with <span class="math">φ(t) = e^(−t²/2)/√(2π)</span>.
+        Its value is needed for every probability of a normal variable, but no formula with a finite number of
+        elementary functions (polynomials, exponentials, logarithms, trigonometric functions and their compositions) gives it.
+      </p>
+      <h3>Liouville's theorem</h3>
+      <p class="note">
+        Liouville (1835) proved that if f and g are rational functions and g is not constant, then
+        <span class="math">∫ f(x)·e^(g(x)) dx</span> is elementary only if there is a rational function R with
+        <span class="math">R′ + g′·R = f</span>, and in that case the antiderivative is <span class="math">R·e^(g)</span>.
+        For the normal density f = 1 and g = −x²/2, so R would have to satisfy <span class="math">R′ − x·R = 1</span>:
+      </p>
+      <ul class="why-list">
+        <li>if R is a non-zero polynomial of degree d, x·R has degree d + 1 and R′ degree d − 1, so R′ − x·R has degree d + 1 ≥ 1 and cannot be the constant 1 (and R = 0 gives 0);</li>
+        <li>if R has a pole of order k at some point c, R′ has a pole of order k + 1 there while x·R has order at most k, so R′ − x·R still has a pole at c, and 1 has none.</li>
+      </ul>
+      <p class="note">
+        No such R exists, so <span class="math">∫ e^(−x²/2) dx</span>, and therefore Φ, is not an elementary function.
+        This is why textbooks such as Hogg, McKean and Craig (section 3.4) give Φ as a table of numerical values.
+      </p>
+      <h3>The error function</h3>
+      <p class="note">
+        The error function is defined as <span class="math">erf(z) = (2/√π)·∫₀ᶻ e^(−t²) dt</span>. With the substitution
+        t = u/√2 and the symmetry of φ,
+        <span class="math">Φ(x) = ½·[1 + erf(x/√2)]</span>: an exact analytical representation of the CDF.
+        erf is a special function with known properties (it is odd, increasing, tends to ±1, has a power series and
+        asymptotic expansions), but it is defined by the same integral, so giving it a name does not provide its
+        digits. To obtain a number one still needs a numerical method: the erf of every programming language is itself
+        computed with series, continued fractions or rational approximations.
+      </p>
+    </section>
+
+    <section id="methods">
+      <h2><span class="sec-num">5</span> Numerical computation of Φ</h2>
+      <ul class="why-list">
+        <li><strong>Numerical integration.</strong> Simpson's rule on [0, x] with n subintervals: <span class="math">Φ(x) ≈ ½ + (h/3)·[φ(0) + 4φ(h) + 2φ(2h) + … + φ(x)]</span>.</li>
+        <li><strong>Power series of erf.</strong> <span class="math">erf(z) = (2/√π)·Σₖ (−1)ᵏ z^(2k+1)/(k!·(2k + 1))</span>, summed until the terms are negligible.</li>
+        <li><strong>Approximation of erf.</strong> Abramowitz and Stegun, formula 7.1.26: <span class="math">erf(z) ≈ 1 − (a₁t + a₂t² + a₃t³ + a₄t⁴ + a₅t⁵)·e^(−z²)</span> with t = 1/(1 + 0.3275911·z), with a guaranteed error below 1.5·10⁻⁷.</li>
+        <li><strong>This method.</strong> For |x| ≤ 3 a series with positive terms only, <span class="math">Φ(x) = ½ + φ(x)·(x + x³/3 + x⁵/(3·5) + x⁷/(3·5·7) + …)</span>, obtained by integrating φ by parts repeatedly. For |x| &gt; 3 Laplace's continued fraction for the tail, <span class="math">1 − Φ(x) = φ(x)/(x + 1/(x + 2/(x + 3/(x + …))))</span>, evaluated from the bottom with 60 levels. Φ(−x) = 1 − Φ(x) is used through the tail directly, so very small probabilities keep their relative accuracy.</li>
+      </ul>
+      <p class="note">
+        Reference values: Wikipedia, <a href="https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule">68–95–99.7 rule</a>,
+        which gives <span class="math">P(|Z| ≤ x) = 2Φ(x) − 1</span> to 15 decimals, so <span class="math">Φ(x) = (1 + P)/2</span>.
+        The table shows the values and the absolute error of each method.
+      </p>
+      <div id="cdf-table" class="table-wrap"></div>
+      <p class="finding">
+        This method agrees with the reference to about 10⁻¹⁶, the precision of the reference itself and of double
+        precision arithmetic. Simpson with 100 subintervals is accurate to about 10⁻¹⁰, A&amp;S 7.1.26 to about 10⁻⁷ as
+        promised, and the erf series is excellent for small x but loses accuracy for large x.
+      </p>
+    </section>
+
   </main>
 
   <script src="js/hw6/integrals.js"></script>
   <script src="js/hw6/pathological.js"></script>
+  <script src="js/hw6/normal.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
