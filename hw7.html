@@ -62,10 +62,31 @@ high, no</textarea>
       <div id="table-col" class="table-wrap"></div>
     </section>
 
+    <section id="test">
+      <h2><span class="sec-num">2</span> Expected frequencies and χ² statistic</h2>
+      <p class="note">
+        If X and F were independent, the joint relative frequency would be the product of the marginals, so the
+        expected count in cell (i, j) is <span class="math">Eᵢⱼ = nᵢ.·n.ⱼ/n</span>. The χ² statistic adds up the squared
+        differences between observed and expected counts, each relative to the expected count:
+        <span class="math">χ² = Σᵢ Σⱼ (nᵢⱼ − Eᵢⱼ)²/Eᵢⱼ</span>. Under independence it follows approximately a χ²
+        distribution with (r − 1)(c − 1) degrees of freedom, where r and c are the numbers of rows and columns,
+        provided the expected counts are at least about 5. The p-value is the probability of a value at least as large:
+        <span class="math">p = P(χ²_df ≥ χ²) = Q(df/2, χ²/2)</span>, computed with the regularized incomplete gamma function.
+      </p>
+      <h3>Expected counts Eᵢⱼ under independence</h3>
+      <div id="table-expected" class="table-wrap"></div>
+      <h3>Contribution of each cell (nᵢⱼ − Eᵢⱼ)²/Eᵢⱼ</h3>
+      <div id="table-parts" class="table-wrap"></div>
+      <h3>Result</h3>
+      <div id="table-chi" class="table-wrap"></div>
+      <p id="chi-text" class="finding"></p>
+    </section>
+
   </main>
 
   <script src="js/hw7/data.js"></script>
   <script src="js/hw7/table.js"></script>
+  <script src="js/hw7/chisq.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
