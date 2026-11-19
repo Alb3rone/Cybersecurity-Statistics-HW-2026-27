@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 6 – Statistical independence, contingency tables and the chi-square test</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 6 · statistical independence</p>
+    <h1>Contingency tables and the χ² test of independence</h1>
+    <p class="lead">
+      A bivariate dataset (X, F) is summarized in a contingency table, from which marginal and conditional frequencies
+      are computed. Comparing the observed counts with those expected under independence gives the χ² statistic and
+      its p-value, and tells whether the two variables are statistically independent.
+    </p>
+  </header>
+
+  <main>
+    <section id="data">
+      <h2><span class="sec-num">1</span> Data and contingency table</h2>
+      <p class="note">
+        The default dataset is the graduate admissions of the University of California, Berkeley, in fall 1973, for its
+        six largest departments (Bickel, Hammel and O'Connell, <em>Science</em> 187, 1975): 4,526 applicants, each
+        recorded with department (A–F), gender and outcome. The program builds the list of records and counts them;
+        any other dataset can be pasted as lines "X, F".
+      </p>
+      <form id="data-form" class="param-form" novalidate>
+        <label for="in-dataset" class="wide-field"><span class="lbl">dataset</span> <span class="hint">pair of variables (X, F)</span>
+          <select id="in-dataset">
+            <option value="gender-admission">Berkeley 1973: gender × admission</option>
+            <option value="department-admission">Berkeley 1973: department × admission</option>
+            <option value="department-gender">Berkeley 1973: department × gender</option>
+            <option value="custom">custom data</option>
+          </select>
+        </label>
+        <label id="csv-field" for="in-csv" class="wide-field" hidden><span class="lbl">records</span> <span class="hint">one record per line: X, F</span>
+          <textarea id="in-csv" rows="8">low, no
+low, no
+low, yes
+medium, no
+medium, yes
+medium, yes
+high, yes
+high, yes
+high, yes
+high, no</textarea>
+        </label>
+        <button type="submit">Build table</button>
+      </form>
+      <p id="data-error" class="error" role="alert" hidden></p>
+      <p id="data-summary" class="note"></p>
+
+      <h3>Observed counts nᵢⱼ</h3>
+      <div id="table-counts" class="table-wrap"></div>
+      <h3>Joint relative frequencies nᵢⱼ/n and marginal frequencies</h3>
+      <div id="table-joint" class="table-wrap"></div>
+      <h3>Conditional frequencies of F given X: nᵢⱼ/nᵢ.</h3>
+      <div id="table-row" class="table-wrap"></div>
+      <h3>Conditional frequencies of X given F: nᵢⱼ/n.ⱼ</h3>
+      <div id="table-col" class="table-wrap"></div>
+    </section>
+
+  </main>
+
+  <script src="js/hw7/data.js"></script>
+  <script src="js/hw7/table.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
