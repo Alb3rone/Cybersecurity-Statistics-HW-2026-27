@@ -82,11 +82,38 @@ high, no</textarea>
       <p id="chi-text" class="finding"></p>
     </section>
 
+    <section id="theory">
+      <h2><span class="sec-num">3</span> Independence in probability and in statistics</h2>
+      <ul class="why-list">
+        <li><strong>Events.</strong> Two events A and B are independent when <span class="math">P(A ∩ B) = P(A)·P(B)</span>; if P(B) &gt; 0 this is the same as <span class="math">P(A | B) = P(A)</span>: knowing that B happened does not change the probability of A.</li>
+        <li><strong>Random variables.</strong> X and F are independent when every event about X is independent of every event about F. For discrete variables this means <span class="math">P(X = xᵢ, F = fⱼ) = P(X = xᵢ)·P(F = fⱼ)</span> for every pair of values: the joint distribution is the product of the marginals, and the conditional distribution of F is the same for every value of X.</li>
+        <li><strong>In a sample.</strong> The probabilities are unknown and are estimated by relative frequencies. Independence means that the rows of the conditional table of section 1 are all equal to the marginal row, or equivalently that the joint frequencies are the products of the marginal ones. In a finite sample this never holds exactly, so the question is whether the differences are larger than sampling variability would explain.</li>
+        <li><strong>The test.</strong> The χ² test answers that question. The null hypothesis is independence; the p-value is the probability, under that hypothesis, of a discrepancy at least as large as the observed one. A small p-value (below 5%) leads to rejecting independence: the variables are statistically dependent, or associated. A large p-value does not prove independence, it only means that the data are compatible with it.</li>
+      </ul>
+    </section>
+
+    <section id="conclusions">
+      <h2><span class="sec-num">4</span> Interpretation: association is not causation</h2>
+      <p class="note">
+        For gender × admission, χ² ≈ 92 with 1 degree of freedom and p ≈ 10⁻²¹: gender and admission are strongly
+        dependent. Overall 44.5% of the men and 30.4% of the women were admitted. Department × admission and
+        department × gender are dependent too: the departments admit very different shares of applicants, from 64% in
+        A to 6% in F, and men and women applied to different departments. Repeating the test inside each department
+        tells a different story.
+      </p>
+      <div id="table-departments" class="table-wrap"></div>
+      <ul class="why-list">
+        <li><strong>The association disappears within departments.</strong> In five departments out of six the admission rates of men and women are close and the test does not reject independence. In department A the difference is significant, but in favour of women.</li>
+        <li><strong>A confounding variable explains it.</strong> 93% of the women applied to the departments with low admission rates (C to F), while about half of the men applied to A and B, where the rates are high. The overall dependence between gender and admission comes from the department, which is related to both: this is Simpson's paradox.</li>
+        <li><strong>Association versus causality.</strong> The χ² test only says that two variables are not independent in the data. It does not say which one acts on the other, nor whether a third variable drives both. The table alone would suggest discrimination against women, but the per-department analysis shows that the gap is explained by the choice of department. Establishing causality requires controlling for confounders or a randomized experiment, not a test of independence.</li>
+      </ul>
+    </section>
   </main>
 
   <script src="js/hw7/data.js"></script>
   <script src="js/hw7/table.js"></script>
   <script src="js/hw7/chisq.js"></script>
+  <script src="js/hw7/departments.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
