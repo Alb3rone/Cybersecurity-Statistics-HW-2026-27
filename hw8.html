@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HMWK 7 – Modes of convergence, conditional probability and Bayes' theorem</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="page-head">
+    <p class="eyebrow"><a href="index.html">Homework</a> · HMWK 7 · convergence and Bayesian inference</p>
+    <h1>Modes of convergence and Bayes' theorem</h1>
+    <p class="lead">
+      The first part compares the ways in which a sequence of random variables can converge, their roles in the Law of
+      Large Numbers and the Central Limit Theorem, and why √n appears so often. The second part covers conditional
+      probability, Bayes' theorem and how prior, likelihood and posterior work together in Bayesian inference.
+    </p>
+  </header>
+
+  <main>
+    <section id="modes">
+      <h2><span class="sec-num">1</span> The main modes of convergence</h2>
+      <p class="note">Let X₁, X₂, … and X be random variables on the same probability space (Ω, P).</p>
+      <ul class="why-list">
+        <li><strong>In probability</strong>, <span class="math">Xₙ →ᴾ X</span>: for every ε &gt; 0, <span class="math">P(|Xₙ − X| &gt; ε) → 0</span>. For large n a big deviation is unlikely, but it can still happen at some n, and at different n for different outcomes ω.</li>
+        <li><strong>Almost surely</strong>, <span class="math">Xₙ →ᵃ·ˢ· X</span>: <span class="math">P({ω : Xₙ(ω) → X(ω)}) = 1</span>. Each single sequence of outcomes converges, except on a set of probability 0: after some point (depending on ω) the deviations stop for good.</li>
+        <li><strong>In mean square (L²)</strong>: <span class="math">E[(Xₙ − X)²] → 0</span>. The average squared error vanishes; it requires finite second moments and controls the size of the errors, not only their probability.</li>
+        <li><strong>In distribution</strong>, <span class="math">Xₙ →ᵈ X</span>: <span class="math">Fₙ(x) → F(x)</span> at every point where F is continuous. Only the distributions get close: Xₙ and X need not even be defined on the same space.</li>
+      </ul>
+      <h3>How they are related</h3>
+      <p class="note">
+        Almost sure ⇒ in probability ⇒ in distribution, and L² ⇒ in probability (by Chebyshev's inequality,
+        <span class="math">P(|Xₙ − X| &gt; ε) ≤ E[(Xₙ − X)²]/ε²</span>). In distribution to a constant c ⇒ in probability to c.
+        No other implication holds in general:
+      </p>
+      <ul class="why-list">
+        <li><strong>In probability and in L², but not almost surely.</strong> Independent <span class="math">Xₙ ~ Bernoulli(1/n)</span>: <span class="math">P(Xₙ = 1) = E[Xₙ²] = 1/n → 0</span>, but <span class="math">Σ 1/n = ∞</span>, so by the second Borel–Cantelli lemma Xₙ = 1 for infinitely many n with probability 1, and almost no sequence converges to 0.</li>
+        <li><strong>Almost surely, but not in L².</strong> Independent <span class="math">Xₙ = n</span> with probability 1/n² and 0 otherwise: <span class="math">Σ 1/n² &lt; ∞</span>, so by the first Borel–Cantelli lemma only finitely many Xₙ are non-zero and Xₙ → 0 almost surely, while <span class="math">E[Xₙ²] = n²·1/n² = 1</span> for every n.</li>
+        <li><strong>In distribution, but not in probability.</strong> X ~ Bernoulli(½) and <span class="math">Xₙ = 1 − X</span> for every n: Xₙ has exactly the distribution of X, but <span class="math">|Xₙ − X| = 1</span> always.</li>
+      </ul>
+      <h3>Simulation of the first counterexample</h3>
+      <p class="note">
+        m sequences X₁, X₂, … with independent <span class="math">Xₙ ~ Bernoulli(1/n)</span> are simulated up to n = 10⁹.
+        Since <span class="math">P(no 1 among Xₙ₊₁, …, Xⱼ) = n/j</span>, after a 1 at position n the next one is at
+        <span class="math">⌊n/U⌋ + 1</span> with U uniform on (0, 1), so only the positions of the ones need to be generated.
+      </p>
+      <form id="conv-form" class="param-form" novalidate>
+        <label for="in-paths"><span class="lbl">m</span> <span class="hint">sequences (100–100000)</span>
+          <input id="in-paths" type="number" min="100" max="100000" step="100" value="10000">
+        </label>
+        <button type="submit">Simulate</button>
+      </form>
+      <p id="conv-error" class="error" role="alert" hidden></p>
+      <div id="conv-table" class="table-wrap"></div>
+      <p class="finding">
+        The probability of a 1, and E[Xₙ²], fall by a factor 10 in every block, so Xₙ → 0 in probability and in L².
+        Yet in every block about 90% of the sequences still contain a 1, on average ln 10 ≈ 2.3 of them: the deviations
+        never stop, and on almost every sequence Xₙ does not converge.
+      </p>
+    </section>
+
+    <section id="roles">
+      <h2><span class="sec-num">2</span> Their roles in the LLN, the CLT and other results</h2>
+      <p class="note">X₁, X₂, … are independent and identically distributed with mean μ and variance σ², and <span class="math">X̄ₙ = Sₙ/n</span>.</p>
+      <ul class="why-list">
+        <li><strong>Weak Law of Large Numbers: in probability.</strong> <span class="math">X̄ₙ →ᴾ μ</span>. With σ² &lt; ∞ it follows from Chebyshev, <span class="math">P(|X̄ₙ − μ| &gt; ε) ≤ σ²/(nε²)</span>, as checked in HMWK 3. In statistics this is the definition of a consistent estimator: with enough data the estimate is close to the true value with high probability.</li>
+        <li><strong>Mean square.</strong> <span class="math">E[(X̄ₙ − μ)²] = σ²/n → 0</span>, so X̄ₙ → μ in L², which gives the weak law and also the rate. The mean squared error of an estimator, <span class="math">MSE = variance + bias²</span>, is the L² distance from the true value, the usual measure of its quality.</li>
+        <li><strong>Strong Law of Large Numbers: almost surely.</strong> <span class="math">X̄ₙ →ᵃ·ˢ· μ</span>, assuming only E|X| &lt; ∞ (Kolmogorov). It is a statement about each single infinite sequence of observations: the running average of one attacker's trajectory in HMWK 3 converges with probability 1. It justifies the frequency interpretation of probability and Monte Carlo simulation, where only one long run is observed.</li>
+        <li><strong>Central Limit Theorem: in distribution.</strong> <span class="math">√n·(X̄ₙ − μ)/σ →ᵈ N(0, 1)</span>. It does not say that X̄ₙ converges to something new, but describes the shape and the size of its error, and it cannot be strengthened: the standardized mean keeps fluctuating and does not converge in probability. It is the basis of approximate confidence intervals and tests.</li>
+        <li><strong>Other results.</strong> The Glivenko–Cantelli theorem: the empirical distribution function converges to F almost surely and uniformly, the basis of the Kolmogorov–Smirnov test used in HMWK 3. Slutsky's theorem: if Xₙ →ᵈ X and Yₙ →ᴾ c, then Xₙ·Yₙ →ᵈ cX, which allows replacing σ by the sample standard deviation s. The delta method: <span class="math">√n·(g(X̄ₙ) − g(μ)) →ᵈ N(0, g′(μ)²σ²)</span>. Maximum likelihood estimators are consistent (in probability) and asymptotically normal (in distribution).</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <script src="js/hw8/common.js"></script>
+  <script src="js/hw8/convergence.js"></script>
+
+  <footer class="page-foot">
+    <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
+  </footer>
+</body>
+</html>
