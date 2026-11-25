@@ -71,10 +71,49 @@
       </ul>
     </section>
 
+    <section id="sqrtn">
+      <h2><span class="sec-num">3</span> Why √n</h2>
+      <ul class="why-list">
+        <li><strong>Variances add, standard deviations do not.</strong> For any random variables <span class="math">Var(X₁ + … + Xₙ) = Σᵢ Var(Xᵢ) + 2·Σᵢ&lt;ⱼ Cov(Xᵢ, Xⱼ)</span>. If they are independent, or just uncorrelated, all covariances vanish and <span class="math">Var(Sₙ) = nσ²</span>: the standard deviation grows like <span class="math">σ√n</span>, not like n, because independent errors partly cancel.</li>
+        <li><strong>The only normalization with a non-trivial limit.</strong> <span class="math">Var((Sₙ − nμ)/nᵃ) = σ²·n^(1 − 2a)</span>: it diverges for a &lt; ½, as for Sₙ, goes to 0 for a &gt; ½, as for Sₙ/n (the LLN), and stays equal to σ² only for a = ½. This is why the CLT is stated for √n·(X̄ₙ − μ), and why Sₙ/√n kept a constant width in HMWK 3.</li>
+        <li><strong>Statistical inference.</strong> The standard error of the mean is <span class="math">σ/√n</span>, estimated by s/√n, and the 95% confidence interval is <span class="math">x̄ ± 1.96·s/√n</span>. Precision improves only with the square root of the data: dividing the error by 10 needs 100 times more observations, and the sample size for a margin δ is <span class="math">n = (1.96·σ/δ)²</span>. Estimators whose error decreases like 1/√n are called √n-consistent.</li>
+        <li><strong>The role of independence.</strong> If every pair has correlation ρ &gt; 0, <span class="math">Var(X̄ₙ) = σ²·(1 + (n − 1)ρ)/n → ρσ²</span>: the error does not vanish and the LLN fails, because a common component never averages out. n correlated observations are worth only <span class="math">n/(1 + (n − 1)ρ) &lt; 1/ρ</span> independent ones. In security data this happens with alerts from the same campaign or systems sharing a vulnerability.</li>
+      </ul>
+      <h3>Standard deviations with σ = 1</h3>
+      <div id="sqrt-table" class="table-wrap"></div>
+      <h3>Sample size for a given precision</h3>
+      <div id="sample-size" class="table-wrap"></div>
+    </section>
+
+    <section id="bayes">
+      <h2><span class="sec-num">4</span> Conditional probability and Bayes' theorem</h2>
+      <ul class="why-list">
+        <li><strong>Conditional probability.</strong> For P(B) &gt; 0, <span class="math">P(A | B) = P(A ∩ B)/P(B)</span>: the probability of A when B is known to have happened, obtained by restricting the sample space to B. In probability theory it gives the product rule <span class="math">P(A ∩ B) = P(A | B)·P(B)</span>, the law of total probability <span class="math">P(B) = Σᵢ P(B | Aᵢ)·P(Aᵢ)</span> for a partition A₁, A₂, …, and the definition of independence, P(A | B) = P(A). In statistics, conditional frequencies estimate conditional probabilities (the row profiles of HMWK 6), and the probability of the data given a parameter, p(x | θ), is the model itself.</li>
+        <li><strong>Bayes' theorem.</strong> Combining the two rules, <span class="math">P(Aᵢ | B) = P(B | Aᵢ)·P(Aᵢ) / Σⱼ P(B | Aⱼ)·P(Aⱼ)</span>: it inverts the conditioning, from the probability of the evidence given each cause to the probability of each cause given the evidence.</li>
+      </ul>
+      <h3>Prior, likelihood and posterior</h3>
+      <p class="note">
+        In Bayesian inference the unknown parameter θ is treated as a random variable and Bayes' theorem is applied to θ and the data x:
+        <span class="math">π(θ | x) = p(x | θ)·π(θ) / ∫ p(x | θ′)·π(θ′) dθ′</span>, that is <strong>posterior ∝ likelihood × prior</strong>.
+      </p>
+      <ul class="why-list">
+        <li><strong>Prior π(θ)</strong>: what is believed about θ before the data, from previous studies, experts or physical constraints, expressed as a probability distribution.</li>
+        <li><strong>Likelihood L(θ) = p(x | θ)</strong>: the probability of the observed data as a function of θ. It is not a distribution over θ (it need not integrate to 1); it measures how well each value of θ explains the data, and it is the only way the data enter.</li>
+        <li><strong>Posterior π(θ | x)</strong>: the updated distribution of θ. The denominator only makes it integrate to 1. Every conclusion comes from it: the posterior mean or mode as an estimate, a credible interval with <span class="math">P(a ≤ θ ≤ b | x) = 95%</span>, the probability of a hypothesis, predictions of new data.</li>
+      </ul>
+      <p class="note">
+        Updating is sequential and coherent: the posterior after a first batch of data is the prior for the next, and
+        the result is the same as using all the data at once. This is why updating is central to Bayesian inference:
+        learning from data becomes a single rule of probability. The frequentist approach instead treats θ as fixed and
+        reasons on <span class="math">P(data | θ)</span>, as with the p-value of HMWK 6, which is not the probability that the hypothesis is true.
+      </p>
+    </section>
+
   </main>
 
   <script src="js/hw8/common.js"></script>
   <script src="js/hw8/convergence.js"></script>
+  <script src="js/hw8/sqrtn.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
