@@ -109,11 +109,61 @@
       </p>
     </section>
 
+    <section id="examples">
+      <h2><span class="sec-num">5</span> Examples</h2>
+      <h3>A malware alert: the prior is the base rate</h3>
+      <p class="note">
+        An antivirus flags a file. The prior is the share of infected files, P(malware); the likelihood is given by the
+        sensitivity <span class="math">P(alert | malware)</span> and the false-positive rate <span class="math">P(alert | clean)</span>;
+        the posterior is <span class="math">P(malware | alert) = P(alert | malware)·P(malware) / P(alert)</span>.
+      </p>
+      <form id="alert-form" class="param-form" novalidate>
+        <label for="in-sens"><span class="lbl">sensitivity</span> <span class="hint">P(alert | malware)</span>
+          <input id="in-sens" type="number" min="0.001" max="0.999" step="0.001" value="0.99">
+        </label>
+        <label for="in-fpr"><span class="lbl">false positives</span> <span class="hint">P(alert | clean)</span>
+          <input id="in-fpr" type="number" min="0.001" max="0.999" step="0.001" value="0.01">
+        </label>
+        <button type="submit">Compute</button>
+      </form>
+      <p id="alert-error" class="error" role="alert" hidden></p>
+      <div id="alert-table" class="table-wrap"></div>
+      <p class="finding">
+        With a 99% accurate scanner, an alert on a file from a population where 1 file in 1,000 is infected gives only a
+        9% probability of malware: the false alarms on the 999 clean files outnumber the true detections. The same
+        likelihood leads to very different conclusions depending on the prior. A second independent alert, using the
+        first posterior as the new prior, raises it to about 91%.
+      </p>
+      <h3>Share of vulnerable servers: Beta prior and binomial likelihood</h3>
+      <p class="note">
+        θ is the unknown fraction of vulnerable servers in a company. A scan of n servers finds k vulnerable, so the
+        likelihood is binomial, <span class="math">L(θ) ∝ θᵏ(1 − θ)ⁿ⁻ᵏ</span>. With a prior <span class="math">Beta(a, b) ∝ θᵃ⁻¹(1 − θ)ᵇ⁻¹</span>,
+        the posterior is <span class="math">Beta(a + k, b + n − k)</span>, with mean <span class="math">(a + k)/(a + b + n)</span>:
+        the prior acts like a + b previous observations, a of them vulnerable. Three priors are compared on scans that
+        all find 30% of vulnerable servers.
+      </p>
+      <div id="beta-table" class="table-wrap"></div>
+      <p class="finding">
+        With 10 servers the conclusions depend strongly on the prior: the three posterior means range from 17% to 48%.
+        As n grows the likelihood dominates and all posteriors concentrate around 30%, but the wrong, strong prior still
+        pulls the estimate with 100 servers. With 1,000 servers the three posterior means are all within 2 points of 30%.
+      </p>
+    </section>
+
+    <section id="discussion">
+      <h2><span class="sec-num">6</span> Advantages, limitations and influence on the conclusions</h2>
+      <ul class="why-list">
+        <li><strong>Advantages.</strong> The answer is a probability about the quantity of interest, such as P(malware | alert) or P(θ &gt; 20% | data), which is what a decision needs. Previous knowledge (base rates, past audits) is used explicitly. Small samples give reasonable answers: 0 vulnerable servers out of 10 does not mean θ = 0. Updating as new data arrive is natural.</li>
+        <li><strong>Limitations.</strong> The prior is a choice, and different analysts can reach different conclusions from the same data; a strong wrong prior needs a lot of data to be corrected. "Uninformative" priors are not unique: a uniform prior on θ is not uniform on other scales. The likelihood is also an assumption (independence of the servers, the same θ for all). Outside conjugate models the integral in the denominator has no closed form and needs numerical methods such as Markov chain Monte Carlo.</li>
+        <li><strong>Influence on the conclusions.</strong> The weight of the prior is like that of a fixed number of observations, so it matters with little data and fades as n grows: with large samples Bayesian and frequentist estimates agree. When the data are few, or the event is rare as in the malware example, the prior decides the result, and the choice should be justified and its effect checked with several priors.</li>
+      </ul>
+    </section>
   </main>
 
   <script src="js/hw8/common.js"></script>
   <script src="js/hw8/convergence.js"></script>
   <script src="js/hw8/sqrtn.js"></script>
+  <script src="js/hw8/bayes.js"></script>
 
   <footer class="page-foot">
     <p>Statistics in Cybersecurity · Sapienza University of Rome · 2026/27</p>
